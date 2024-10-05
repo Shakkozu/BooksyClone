@@ -3,8 +3,12 @@ using Bogus.Extensions.Poland;
 using BooksyClone.Domain.BusinessOnboarding.FetchingBusinessCreationApplication;
 using BooksyClone.Domain.BusinessOnboarding.Model;
 using BooksyClone.Domain.BusinessOnboarding.RegisteringANewBusiness;
+using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.VisualBasic;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Newtonsoft.Json;
+using NUnit.Framework;
 using Serilog;
 using System.Net;
 using System.Net.Http.Json;
@@ -33,7 +37,7 @@ public class OnboardingProcessTests
 * And: the user uploads an attachment that confirms the user's identity
 * Then: a business draft requiring verification is created successfully
 * And: Creator of the business draft can fetch it via GET /business-unit/{identifier}
-* 
+* And: Information that business draft was created is published on message bus
 * }
 * */
 
@@ -68,6 +72,7 @@ public class OnboardingProcessTests
         AndUserUploadedAnAttachmentThatConfirmsTheUsersIdentity();
         ThenBusinessDraftRequiringVerificationIsCreatedSuccessfully();
         AndCreatorOfTheBusinessDraftCanFetchIt();
+        AndInformationThatBusinessDraftWasRegisteredIsPublishedOnMessageBus();
     }
 
     private void GivenApplicationUserFillsRegistrationFormToRegisterANewBusinessWithCorrectData()
@@ -150,6 +155,11 @@ public class OnboardingProcessTests
         result.EnsureSuccessStatusCode();
         var retrievedBusinessCreationDraftRequest = result.Content.ReadFromJsonAsync<FetchBusinessDraftStateResponse>().GetAwaiter().GetResult();
         BusinessDraftComparer.AreEqual(retrievedBusinessCreationDraftRequest, _request);
+    }
+
+    private void AndInformationThatBusinessDraftWasRegisteredIsPublishedOnMessageBus()
+    {
+        // todo
     }
 
 
