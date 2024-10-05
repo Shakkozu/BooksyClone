@@ -1,9 +1,11 @@
 ﻿
 
+
+
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
+using Serilog;
 
 namespace BooksyClone.Tests;
 
@@ -47,7 +49,7 @@ public class BooksyCloneApp : WebApplicationFactory<Program>
         base.ConfigureWebHost(builder);
         builder.ConfigureAppConfiguration(configurationBuilder =>
         {
-            //configurationBuilder.AddInMemoryCollection();
+
         });
         builder.ConfigureServices(collection =>
         {
@@ -63,43 +65,6 @@ public class BooksyCloneApp : WebApplicationFactory<Program>
     {
         return CreateClient();
     }
-
-    //public async Task<HttpClient> CreateHttpClientWithAuthorizationAsync(UserType userType = UserType.User)
-    //{
-    //    var client = CreateClient();
-    //    if (!string.IsNullOrEmpty(_token))
-    //    {
-    //        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {_token}");
-    //        return client;
-    //    }
-
-    //    string? authToken;
-    //    switch (userType)
-    //    {
-    //        case UserType.Admin:
-    //            authToken = await RequestScope().ServiceProvider.GetRequiredService<AuthFixture>().GetAuthenticationTokenForSuperUserAsync();
-    //            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {authToken}");
-    //            break;
-    //        case UserType.User:
-    //            authToken = await RequestScope().ServiceProvider.GetRequiredService<AuthFixture>().GetAuthenticationTokenForUserAsync();
-    //            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {authToken}");
-    //            break;
-    //    }
-    //    return client;
-    //}
-
-    internal CreateProductCommandHandler CreateProductCommandHandler => RequestScope().ServiceProvider.GetRequiredService<CreateProductCommandHandler>();
-    internal SearchProductsQueryHandler SearchProductsQueryHandler => RequestScope().ServiceProvider.GetRequiredService<SearchProductsQueryHandler>();
-    internal ImportProductsToCatalogue ProductCatalogueImportHandler => RequestScope().ServiceProvider.GetRequiredService<ImportProductsToCatalogue>();
-    internal ProductsTestsFixture ProductsTestsFixture => RequestScope().ServiceProvider.GetRequiredService<ProductsTestsFixture>();
-    internal MealsTestsFixture MealsTestsFixture => RequestScope().ServiceProvider.GetRequiredService<MealsTestsFixture>();
-    internal AuthFixture AuthFixture => RequestScope().ServiceProvider.GetRequiredService<AuthFixture>();
-
-    internal ICommandHandler<SaveMealNutritionEntriesCommand> AddNutritionEntriesCommandHandler => RequestScope().ServiceProvider.GetRequiredService<ICommandHandler<SaveMealNutritionEntriesCommand>>();
-    internal GetNutritionDayQueryHandler GetDiaryQueryHandler => RequestScope().ServiceProvider.GetRequiredService<GetNutritionDayQueryHandler>();
-    internal GetShortSummaryForDaysQueryHandler GetShortSummaryForDaysQueryHandler => RequestScope().ServiceProvider.GetRequiredService<GetShortSummaryForDaysQueryHandler>();
-    internal ICommandHandler<CleanupNutritionistModuleCommand> CleanupNutritionistModuleCommandHandler => RequestScope().ServiceProvider.GetRequiredService<ICommandHandler<CleanupNutritionistModuleCommand>>();
-    internal ICommandHandler<RegisterNutritionistCommand> RegisterNutritionistCommandHandler => RequestScope().ServiceProvider.GetRequiredService<ICommandHandler<RegisterNutritionistCommand>>();
 
     public enum UserType
     {

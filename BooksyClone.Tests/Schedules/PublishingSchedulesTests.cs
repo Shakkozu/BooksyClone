@@ -18,23 +18,10 @@ internal class PublishingSchedulesTests
      */
 
 
-    [Test]
-    public async Task ProcessingBusinessUnitRegisteredEventDefinesBusinessUnitWithEmployeesAndManagers()
-    {
-        var @event = new BusinessUnitRegisteredEvent
-        {
-            BusinessUnitId = Guid.NewGuid(),
-            ManagersId = new[] { Guid.NewGuid() },
-            EmployeesId = new[] { Guid.NewGuid() },
-            Timestamp = DateTime.Now,
-        };
 
 
 
 
-
-
-    }
 
 
 }

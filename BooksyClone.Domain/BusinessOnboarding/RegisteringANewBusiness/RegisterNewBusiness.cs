@@ -1,52 +1,58 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BooksyClone.Domain.BusinessOnboarding.Model;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace BooksyClone.Domain.BusinessOnboarding.RegisteringANewBusiness;
 
-
-public class RegisterNewBusinessRequest
+public static class RegisterNewBusinessRoute
 {
-    public Guid CorrelationId { get; set; }
-    public DateTime Timestamp { get; set; }
+    public static IEndpointRouteBuilder MapRegisterNewBusinessEndpoint(this IEndpointRouteBuilder endpoints)
+    {
+        endpoints.MapPost("test", () =>
+        {
+            return Results.Ok();
 
-    // Informacje o biznesie
-    public required string BusinessName { get; set; }  // Nazwa biznesu
-    public required BusinessType BusinessType { get; set; }  // Typ biznesu (np. salon, restauracja, itd.)
-    public required string BusinessNIP { get; set; }  // Numer identyfikacji podatkowej (NIP)
-    public required string BusinessAddress { get; set; }  // Adres siedziby biznesu
-    public required string BusinessPhoneNumber { get; set; }  // Numer telefonu kontaktowego
-    public required string BusinessEmail { get; set; }  // Adres e-mail do kontaktu
+        });
+        endpoints.MapPost("/api/v1/business", async (
+            HttpContext context,
+            HttpRequest request,
+            ILogger<RegisterNewBusinessRequest> logger,
+            CancellationToken ct,
+            OnboardingFacade facade) =>
+        {
+            var payload = await request.ReadFormAsync(ct);
+            var contentBody = new RegisterNewBusinessRequest
+            {
+                CorrelationId = Guid.Parse(payload["CorrelationId"].Single()),
+                BusinessName = payload["BusinessName"].Single(),
+                BusinessType = Enum.Parse<BusinessType>(payload["BusinessType"].Single()),
+                BusinessNIP = payload["BusinessNIP"].Single(),
+                BusinessAddress = payload["BusinessAddress"].Single(),
+                BusinessPhoneNumber = payload["BusinessPhoneNumber"].Single(),
+                BusinessEmail = payload["BusinessEmail"].Single(),
+                UserId = Guid.Parse(payload["UserId"].Single()),
+                UserFullName = payload["UserFullName"].Single(),
+                UserIdNumber = payload["UserIdNumber"].Single(),
+                UserEmail = payload["UserEmail"].Single(),
+                UserPhoneNumber = payload["UserPhoneNumber"].Single(),
+                LegalConsent = bool.Parse(payload["LegalConsent"].Single()),
+                LegalConsentContent = payload["LegalConsentContent"].Single(),
+                BusinessProofDocument = payload.Files["BusinessProofDocument"],
+                UserIdentityDocument = payload.Files["UserIdentityDocument"]
+            };
 
-    // Informacje o użytkowniku
-    public Guid UserId { get; set; }
-    public required string UserFullName { get; set; }  // Imię i nazwisko właściciela
-    public required string UserIdNumber { get; set; }  // Numer dowodu osobistego
-    public required string UserEmail { get; set; }  // Adres e-mail właściciela
-    public required string UserPhoneNumber { get; set; }  // Numer telefonu właściciela
+            var validationErrors = contentBody.GetValidationErrors();
+            if(validationErrors.Any())
+                return Results.BadRequest(validationErrors);
 
-    // Dokumenty potwierdzające
-    public IFormFile BusinessProofDocument { get; set; }  // Dokument potwierdzający istnienie biznesu (np. umowa, zaświadczenie)
-    public IFormFile UserIdentityDocument { get; set; }  // Dokument potwierdzający tożsamość właściciela (np. dowód osobisty)
+            var result = await facade.RegisterNewBusinessDraftAsync(BusinessDraft.From(contentBody), ct);
 
-    // Zgoda prawna
-    public bool LegalConsent { get; set; }  // Potwierdzenie zgody prawnej
-    public required string LegalConsentContent { get; set; }
-}
+            return Results.Created($"/api/v1/business/{result}", result);
+        });
 
-public enum BusinessType
-{
-    Barber,
-    Hair,
-    Nails,
-    Brows,
-    BeautySalons
-}
-
-
-internal class RegisterNewBusiness
-{
+        return endpoints;
+    }
 }

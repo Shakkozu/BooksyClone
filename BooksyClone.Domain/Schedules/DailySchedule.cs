@@ -1,5 +1,4 @@
-﻿
-namespace BooksyClone.Domain;
+﻿namespace BooksyClone.Domain.Schedules;
 
 public class DailySchedule
 {
@@ -15,7 +14,7 @@ public class DailySchedule
         HashSet<Reservation> reservations,
         TimeSlot workingHours)
     {
-        return new DailySchedule(today, employeeId,supervisorId, reservations, workingHours);
+        return new DailySchedule(today, employeeId, supervisorId, reservations, workingHours);
     }
 
     private DailySchedule(DateTime day,

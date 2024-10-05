@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BooksyClone.Contract\BooksyClone.Contract.csproj" />
     <ProjectReference Include="..\BooksyClone.Domain\BooksyClone.Domain.csproj" />
+    <ProjectReference Include="..\BooksyClone\BooksyClone.csproj" />
   </ItemGroup>
 
   <ItemGroup>

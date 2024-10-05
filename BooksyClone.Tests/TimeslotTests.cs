@@ -1,4 +1,4 @@
-﻿using BooksyClone.Domain;
+﻿using BooksyClone.Domain.Schedules;
 
 namespace BooksyClone.Tests;
 

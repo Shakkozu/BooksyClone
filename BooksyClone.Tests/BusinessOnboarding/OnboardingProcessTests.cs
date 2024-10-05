@@ -1,22 +1,28 @@
 ﻿using Bogus;
 using Bogus.Extensions.Poland;
+using BooksyClone.Domain.BusinessOnboarding.FetchingBusinessCreationApplication;
+using BooksyClone.Domain.BusinessOnboarding.Model;
 using BooksyClone.Domain.BusinessOnboarding.RegisteringANewBusiness;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
-using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
+using Newtonsoft.Json;
+using Serilog;
+using System.Net;
+using System.Net.Http.Json;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BooksyClone.Tests.BusinessOnboarding;
-internal class OnboardingProcessTests
+[TestFixture]
+public class OnboardingProcessTests
 {
+    private const string _legalConsent = "Oświadczam że wprowadzone przeze mnie dane są poprawne i zgodne z stanem faktycznym.";
     private Faker _generator;
+    private BooksyCloneApp _app;
     private RegisterNewBusinessRequest _request;
+    private IFormFile _businessProofDocument;
+    private IFormFile _userIdentityDocument;
     private Guid _userId;
+    private MultipartFormDataContent _formData;
+    private HttpResponseMessage _response;
 
     /*
 * Scenario: Business onboarding process that creates a business draft
@@ -26,6 +32,8 @@ internal class OnboardingProcessTests
 * And: the user uploads an attachment that confirms the existence of the mentioned business
 * And: the user uploads an attachment that confirms the user's identity
 * Then: a business draft requiring verification is created successfully
+* And: Creator of the business draft can fetch it via GET /business-unit/{identifier}
+* 
 * }
 * */
 
@@ -34,17 +42,32 @@ internal class OnboardingProcessTests
     {
         _userId = Guid.NewGuid();
         _generator = new Faker("pl");
-        _app = 
+        _app = BooksyCloneApp.CreateInstance();
     }
 
+    [TearDown]
+    public void Teardown()
+    {
+        _response?.Dispose();
+        _formData?.Dispose();
+    }
+
+    [OneTimeTearDown]
+    public void OneTimeTeardown()
+    {
+        _app.Dispose();
+    }
+
+
     [Test]
-    public async Task OnboadringProcessScenarioTest()
+    public void OnboadringProcessScenarioTest()
     {
         GivenApplicationUserFillsRegistrationFormToRegisterANewBusinessWithCorrectData();
         AndUserConfirmedLegalConsentThatProvidedDataIsAccurate();
         AndUserUploadedAnAttachmentThatConfirmsTheExistenceOfMentionedBusiness();
         AndUserUploadedAnAttachmentThatConfirmsTheUsersIdentity();
         ThenBusinessDraftRequiringVerificationIsCreatedSuccessfully();
+        AndCreatorOfTheBusinessDraftCanFetchIt();
     }
 
     private void GivenApplicationUserFillsRegistrationFormToRegisterANewBusinessWithCorrectData()
@@ -59,39 +82,74 @@ internal class OnboardingProcessTests
             CorrelationId = Guid.NewGuid(),
             Timestamp = DateTime.Today.AddHours(15),
             UserEmail = _generator.Person.Email,
-            BusinessPhoneNumber = _generator.Person.Phone,
+            BusinessPhoneNumber = _generator.Phone.PhoneNumber("#########"),
             UserFullName = _generator.Person.FullName,
             UserIdNumber = _generator.Person.Pesel(),
             UserId = _userId,
-            UserPhoneNumber = _generator.Person.Phone,
+            UserPhoneNumber = _generator.Phone.PhoneNumber("#########"),
             LegalConsent = true,
-            LegalConsentContent = "Oświadczam że wprowadzone przeze mnie dane są poprawne i zgodne z stanem faktycznym.",
-            BusinessProofDocument = CreateFakeFormFile("businessIdentificationDocument.jpg", "test"),
-            UserIdentityDocument = CreateFakeFormFile("userIdentity.jpg", "test"),
+            LegalConsentContent = _legalConsent,
+        };
+        _businessProofDocument = CreateFakeFormFile("businessIdentificationDocument.jpg", "test");
+        _userIdentityDocument = CreateFakeFormFile("userIdentity.jpg", "test");
+        var httpClient = _app.CreateHttpClient();
+
+        _formData = new MultipartFormDataContent
+        {
+            { new StreamContent(_businessProofDocument.OpenReadStream()), "BusinessProofDocument", _businessProofDocument.FileName },
+            { new StreamContent(_userIdentityDocument.OpenReadStream()), "UserIdentityDocument", _userIdentityDocument.FileName },
+             { new StringContent(_request.CorrelationId.ToString()), "CorrelationId" },
+            { new StringContent(_request.Timestamp.ToString("O")), "Timestamp" }, // ISO 8601 format
+            { new StringContent(_request.BusinessName), "BusinessName" },
+            { new StringContent(_request.BusinessType.ToString()), "BusinessType" }, // Assuming it's an enum
+            { new StringContent(_request.BusinessNIP), "BusinessNIP" },
+            { new StringContent(_request.BusinessAddress), "BusinessAddress" },
+            { new StringContent(_request.BusinessPhoneNumber), "BusinessPhoneNumber" },
+            { new StringContent(_request.BusinessEmail), "BusinessEmail" },
+            { new StringContent(_request.UserId.ToString()), "UserId" },
+            { new StringContent(_request.UserFullName), "UserFullName" },
+            { new StringContent(_request.UserIdNumber), "UserIdNumber" },
+            { new StringContent(_request.UserEmail), "UserEmail" },
+            { new StringContent(_request.UserPhoneNumber), "UserPhoneNumber" },
+            { new StringContent(_request.LegalConsent.ToString()), "LegalConsent" },
+            { new StringContent(_request.LegalConsentContent), "LegalConsentContent" },
+
         };
 
 
+        _response = httpClient.PostAsync("/api/v1/business", _formData).GetAwaiter().GetResult();
+        var content = _response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+        Log.Information("Returned content was: {@content}", content);
     }
 
     private void AndUserConfirmedLegalConsentThatProvidedDataIsAccurate()
     {
-        throw new NotImplementedException();
+        Assert.True(_request.LegalConsent);
+        Assert.That(_request.LegalConsentContent, Is.EqualTo(_legalConsent));
     }
     private void AndUserUploadedAnAttachmentThatConfirmsTheExistenceOfMentionedBusiness()
     {
-        throw new NotImplementedException();
+        Assert.True(_businessProofDocument.Length > 0);
     }
 
     private void AndUserUploadedAnAttachmentThatConfirmsTheUsersIdentity()
     {
-        throw new NotImplementedException();
+        Assert.True(_userIdentityDocument.Length > 0);
     }
-
-
 
     private void ThenBusinessDraftRequiringVerificationIsCreatedSuccessfully()
     {
-        throw new NotImplementedException();
+        Assert.That(_response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+    }
+
+    private void AndCreatorOfTheBusinessDraftCanFetchIt()
+    {
+        var httpClient = _app.CreateHttpClient();
+        var businessDraftId = _response.Content.ReadAsStringAsync().Result.Replace("\"", "");
+        var result = httpClient.GetAsync($"/api/v1/business/{businessDraftId}").GetAwaiter().GetResult();
+        result.EnsureSuccessStatusCode();
+        var retrievedBusinessCreationDraftRequest = result.Content.ReadFromJsonAsync<FetchBusinessDraftStateResponse>().GetAwaiter().GetResult();
+        BusinessDraftComparer.AreEqual(retrievedBusinessCreationDraftRequest, _request);
     }
 
 
@@ -109,4 +167,44 @@ internal class OnboardingProcessTests
         };
     }
 
+}
+
+
+public static class BusinessDraftComparer
+{
+    public static bool AreEqual(FetchBusinessDraftStateResponse response, RegisterNewBusinessRequest request)
+    {
+        if (response == null || request == null)
+            return false;
+
+        // Compare scalar properties
+        return response.BusinessName == request.BusinessName &&
+               response.BusinessType == request.BusinessType.ToString() &&  // Assuming BusinessType is an enum
+               response.BusinessNIP == request.BusinessNIP &&
+               response.BusinessAddress == request.BusinessAddress &&
+               response.BusinessPhoneNumber == request.BusinessPhoneNumber &&
+               response.BusinessEmail == request.BusinessEmail &&
+               response.UserId == request.UserId &&
+               response.UserFullName == request.UserFullName &&
+               response.UserIdNumber == request.UserIdNumber &&
+               response.UserEmail == request.UserEmail &&
+               response.UserPhoneNumber == request.UserPhoneNumber &&
+               response.LegalConsent == request.LegalConsent &&
+               response.LegalConsentContent == request.LegalConsentContent &&
+               CompareFileDocuments(response.BusinessProofDocument, request.BusinessProofDocument) &&
+               CompareFileDocuments(response.UserIdentityDocument, request.UserIdentityDocument);
+    }
+
+    private static bool CompareFileDocuments(FileDocument doc1, IFormFile doc2)
+    {
+        if (doc1 == null && doc2 == null) return true;  // Both are null
+        if (doc1 == null || doc2 == null) return false; // One is null, other is not
+
+        var file = FileDocument.From(doc2);
+
+        // Compare necessary properties of FileDocument and IFormFile
+        return doc1.FileName == file.FileName &&
+               doc1.ContentType == file.ContentType &&
+               doc1.Data.Length == file.Data.Length; // You may want to compare the actual content as well
+    }
 }
