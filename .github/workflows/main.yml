@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - master
   pull_request:
 
 jobs:
@@ -19,7 +19,7 @@ jobs:
         run: cp ./BooksyClone/appsettings.Tests.json ./BooksyClone/appsettings.json
 
       - name: Start containers
-        run: docker-compose -f "docker-compose.ci.yml" up -d
+        run: docker compose -f "docker-compose.ci.yml" up -d
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -27,14 +27,14 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Restore NuGet packages
-        run: dotnet restore ./BooksyClone/BooksyClone.sln
+        run: dotnet restore ./BooksyClone.sln
 
       - name: Build
-        run: dotnet build ./BooksyClone/BooksyClone.sln --configuration Release --no-restore
+        run: dotnet build ./BooksyClone.sln --configuration Release --no-restore
 
       - name: Run tests
-        run: dotnet test ./BooksyClone/BooksyClone.sln --configuration Release --no-build --logger:"console;verbosity=normal"
+        run: dotnet test ./BooksyClone.sln --configuration Release --no-build --logger:"console;verbosity=normal"
 
       - name: Stop containers
         if: always()
-        run: docker-compose -f "docker-compose.yml" down
+        run: docker compose -f "docker-compose.ci.yml" down
