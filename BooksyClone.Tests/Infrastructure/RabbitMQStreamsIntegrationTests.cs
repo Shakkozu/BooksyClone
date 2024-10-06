@@ -30,7 +30,7 @@ internal class RabbitMQStreamsIntegrationTests
     }
 
     [Test]
-    public void Test()
+    public void PublishingShouldNotThrowAnyErrors()
     {
         Assert.DoesNotThrowAsync(async() => await _testProducer.Send(new TestMessage("Dupa", DateTime.Now)));
     }
