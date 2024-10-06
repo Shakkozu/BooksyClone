@@ -9,9 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Domain", "Books
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Tests", "BooksyClone.Tests\BooksyClone.Tests.csproj", "{08EA151F-810B-4632-8F44-60D63DE57CA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BooksyClone.Contract", "BooksyClone.Contract\BooksyClone.Contract.csproj", "{AFAB6F38-67BF-4EAB-A459-0A3225323D05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Contract", "BooksyClone.Contract\BooksyClone.Contract.csproj", "{AFAB6F38-67BF-4EAB-A459-0A3225323D05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BooksyClone.Infrastructure", "BooksyClone.Infrastructure\BooksyClone.Infrastructure.csproj", "{1A9B0C01-11BF-445F-B390-4C4AD1650332}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Infrastructure", "BooksyClone.Infrastructure\BooksyClone.Infrastructure.csproj", "{1A9B0C01-11BF-445F-B390-4C4AD1650332}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{D1E1F0F7-C09F-4AD4-BB6B-661BF9EAB5AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{1A9B0C01-11BF-445F-B390-4C4AD1650332}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A9B0C01-11BF-445F-B390-4C4AD1650332}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A9B0C01-11BF-445F-B390-4C4AD1650332}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1E1F0F7-C09F-4AD4-BB6B-661BF9EAB5AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1E1F0F7-C09F-4AD4-BB6B-661BF9EAB5AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1E1F0F7-C09F-4AD4-BB6B-661BF9EAB5AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1E1F0F7-C09F-4AD4-BB6B-661BF9EAB5AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

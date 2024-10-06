@@ -5,7 +5,7 @@ using BooksyClone.Domain.BusinessOnboarding;
 using BooksyClone.Domain.BusinessOnboarding.FetchingBusinessCreationApplication;
 using BooksyClone.Domain.BusinessOnboarding.Model;
 using BooksyClone.Domain.BusinessOnboarding.RegisteringANewBusiness;
-using BooksyClone.Infrastructure.EventProcessing;
+using BooksyClone.Infrastructure.RabbitMQStreams;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;

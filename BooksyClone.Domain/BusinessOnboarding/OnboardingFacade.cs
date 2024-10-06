@@ -3,8 +3,8 @@ using BooksyClone.Infrastructure.Storage;
 using BooksyClone.Domain.Storage;
 using Microsoft.EntityFrameworkCore;
 using BooksyClone.Domain.BusinessOnboarding.FetchingBusinessCreationApplication;
-using BooksyClone.Infrastructure.EventProcessing;
 using BooksyClone.Contract.BusinessOnboarding;
+using BooksyClone.Infrastructure.RabbitMQStreams;
 
 namespace BooksyClone.Domain.BusinessOnboarding;
 

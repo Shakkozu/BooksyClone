@@ -1,0 +1,19 @@
+version: '3.4'
+
+services:
+  booksyclone:
+    image: ${DOCKER_REGISTRY-}booksyclone
+    build:
+      context: .
+      dockerfile: BooksyClone/Dockerfile
+  rabbitmq:
+    image: rabbitmq:3.13
+    container_name: rabbitmq
+    ports:
+    - "5552:5552"
+    - "5672:5672"
+    - "15672:15672"
+    environment:
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbitmq_stream advertised_host localhost"
+    command: >
+      sh -c "rabbitmq-plugins enable rabbitmq_stream rabbitmq_management && rabbitmq-server"

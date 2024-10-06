@@ -2,7 +2,8 @@
 
 
 
-using BooksyClone.Infrastructure.EventProcessing;
+using BooksyClone.Domain.Schedules;
+using BooksyClone.Infrastructure.RabbitMQStreams;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -63,6 +64,7 @@ public class BooksyCloneApp : WebApplicationFactory<Program>
     }
 
     internal IEventPublisher GetEventPublisher => RequestScope().ServiceProvider.GetRequiredService<IEventPublisher>();
+    internal SchedulesFacade SchedulesFacade => RequestScope().ServiceProvider.GetRequiredService<SchedulesFacade>();
 
     public HttpClient CreateHttpClient()
     {
