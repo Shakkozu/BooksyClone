@@ -3,20 +3,30 @@ using BooksyClone.Infrastructure.Storage;
 using BooksyClone.Domain.Storage;
 using Microsoft.EntityFrameworkCore;
 using BooksyClone.Domain.BusinessOnboarding.FetchingBusinessCreationApplication;
+using BooksyClone.Infrastructure.EventProcessing;
+using BooksyClone.Contract.BusinessOnboarding;
 
 namespace BooksyClone.Domain.BusinessOnboarding;
 
 internal class OnboardingFacade
 {
     private readonly SqliteDbContext _dbContext;
+    private readonly IEventPublisher _eventPublisher;
 
-    public OnboardingFacade(SqliteDbContext dbContext)
+    public OnboardingFacade(SqliteDbContext dbContext, IEventPublisher eventPublisher)
     {
         _dbContext = dbContext;
+        _eventPublisher = eventPublisher;
     }
-    internal async Task<Guid> RegisterNewBusinessDraftAsync(BusinessDraft businessDraft, CancellationToken ct)
+    internal async Task<Guid> RegisterNewBusinessDraftAsync(BusinessDraft businessDraft,
+        CancellationToken ct)
     {
         await _dbContext.AddAndSave(businessDraft, ct);
+        var draftPublishedEvent = new BusinessDraftRegisteredEvent(businessDraft.CreatedAt,
+            businessDraft.Guid,
+            businessDraft.UserDetails.Guid);
+
+        await _eventPublisher.PublishAsync(draftPublishedEvent, ct);
         return businessDraft.Guid;
     }
 

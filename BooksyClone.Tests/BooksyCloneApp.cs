@@ -2,6 +2,7 @@
 
 
 
+using BooksyClone.Infrastructure.EventProcessing;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -60,6 +61,8 @@ public class BooksyCloneApp : WebApplicationFactory<Program>
         builder.UseSetting("Environment", "Automated_Tests");
         builder.ConfigureServices(_customization);
     }
+
+    internal IEventPublisher GetEventPublisher => RequestScope().ServiceProvider.GetRequiredService<IEventPublisher>();
 
     public HttpClient CreateHttpClient()
     {

@@ -4,12 +4,31 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BooksyClone.Infrastructure.EventProcessing;
 
+
+public interface IEventPublisher
+{
+    Task PublishAsync(INotification @event, CancellationToken ct);
+}
+
+public class InMemoryEventPublisher: IEventPublisher
+{
+    private readonly IMediator _mediator;
+
+    public InMemoryEventPublisher(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
+
+    public async Task PublishAsync(INotification @event, CancellationToken ct)
+    {
+        await _mediator.Publish(@event, ct);
+    }
+}
+
 public interface IEventHandler<TEvent>
 {
     Task HandleAsync(TEvent @event, CancellationToken ct);
 }
-
-
 
 public abstract class InMemoryEventDispatcher<T> : IEventHandler<T> where T : class, INotification
 {

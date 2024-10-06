@@ -15,4 +15,8 @@
     <PackageReference Include="SQLite" Version="3.13.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="EventPublishing\" />
+  </ItemGroup>
+
 </Project>

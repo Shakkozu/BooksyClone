@@ -1,18 +1,16 @@
 ﻿using Bogus;
 using Bogus.Extensions.Poland;
+using BooksyClone.Contract.BusinessOnboarding;
 using BooksyClone.Domain.BusinessOnboarding.FetchingBusinessCreationApplication;
 using BooksyClone.Domain.BusinessOnboarding.Model;
 using BooksyClone.Domain.BusinessOnboarding.RegisteringANewBusiness;
-using MediatR;
+using BooksyClone.Infrastructure.EventProcessing;
+using FakeItEasy;
 using Microsoft.AspNetCore.Http;
-using Microsoft.VisualBasic;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using Newtonsoft.Json;
-using NUnit.Framework;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System.Net;
 using System.Net.Http.Json;
-using System.Text;
 
 namespace BooksyClone.Tests.BusinessOnboarding;
 [TestFixture]
@@ -20,6 +18,7 @@ public class OnboardingProcessTests
 {
     private const string _legalConsent = "Oświadczam że wprowadzone przeze mnie dane są poprawne i zgodne z stanem faktycznym.";
     private Faker _generator;
+    private IEventPublisher _fakeEventPublisher;
     private BooksyCloneApp _app;
     private RegisterNewBusinessRequest _request;
     private IFormFile _businessProofDocument;
@@ -27,26 +26,18 @@ public class OnboardingProcessTests
     private Guid _userId;
     private MultipartFormDataContent _formData;
     private HttpResponseMessage _response;
-
-    /*
-* Scenario: Business onboarding process that creates a business draft
-* Given: an application user fills in the registration form to register a new business unit via POST /business-unit
-* When: the data provided in the form is correct
-* And: the user confirms legal consent that the provided data is accurate
-* And: the user uploads an attachment that confirms the existence of the mentioned business
-* And: the user uploads an attachment that confirms the user's identity
-* Then: a business draft requiring verification is created successfully
-* And: Creator of the business draft can fetch it via GET /business-unit/{identifier}
-* And: Information that business draft was created is published on message bus
-* }
-* */
+    private Guid _businessDraftId;
 
     [OneTimeSetUp]
     public void Setup()
     {
         _userId = Guid.NewGuid();
         _generator = new Faker("pl");
-        _app = BooksyCloneApp.CreateInstance();
+        _fakeEventPublisher = A.Fake<IEventPublisher>();
+        _app = BooksyCloneApp.CreateInstance(services =>
+        {
+            services.AddSingleton<IEventPublisher>(_fakeEventPublisher);
+        });
     }
 
     [TearDown]
@@ -62,6 +53,19 @@ public class OnboardingProcessTests
         _app.Dispose();
     }
 
+
+    /*
+* Scenario: Business onboarding process that creates a business draft
+* Given: an application user fills in the registration form to register a new business unit via POST /business-unit
+* When: the data provided in the form is correct
+* And: the user confirms legal consent that the provided data is accurate
+* And: the user uploads an attachment that confirms the existence of the mentioned business
+* And: the user uploads an attachment that confirms the user's identity
+* Then: a business draft requiring verification is created successfully
+* And: Creator of the business draft can fetch it via GET /business-unit/{identifier}
+* And: Information that business draft was created is published on message bus
+* }
+* */
 
     [Test]
     public void OnboadringProcessScenarioTest()
@@ -150,8 +154,8 @@ public class OnboardingProcessTests
     private void AndCreatorOfTheBusinessDraftCanFetchIt()
     {
         var httpClient = _app.CreateHttpClient();
-        var businessDraftId = _response.Content.ReadAsStringAsync().Result.Replace("\"", "");
-        var result = httpClient.GetAsync($"/api/v1/business/{businessDraftId}").GetAwaiter().GetResult();
+        _businessDraftId = Guid.Parse(_response.Content.ReadAsStringAsync().Result.Replace("\"", ""));
+        var result = httpClient.GetAsync($"/api/v1/business/{_businessDraftId}").GetAwaiter().GetResult();
         result.EnsureSuccessStatusCode();
         var retrievedBusinessCreationDraftRequest = result.Content.ReadFromJsonAsync<FetchBusinessDraftStateResponse>().GetAwaiter().GetResult();
         BusinessDraftComparer.AreEqual(retrievedBusinessCreationDraftRequest, _request);
@@ -159,7 +163,18 @@ public class OnboardingProcessTests
 
     private void AndInformationThatBusinessDraftWasRegisteredIsPublishedOnMessageBus()
     {
-        // todo
+        var @event = new BusinessDraftRegisteredEvent(
+            DateTime.Now,
+            _businessDraftId,
+            _request.UserId
+            );
+        A.CallTo(() => _fakeEventPublisher.PublishAsync(A<BusinessDraftRegisteredEvent>.That.Matches(
+            ev => ev.BusinessUnitId == _businessDraftId
+            && ev.OwnerId == _request.UserId
+            && ev.RegisteredAt.Date == DateTime.Now.Date
+            ),
+            A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+
     }
 
 
