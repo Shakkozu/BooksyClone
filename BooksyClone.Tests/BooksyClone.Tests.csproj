@@ -34,7 +34,6 @@
 
   <ItemGroup>
     <Folder Include="BusinessOnboarding\LegalConsents\" />
-    <Folder Include="BusinessOnboarding\NewFolder\" />
   </ItemGroup>
 
 </Project>

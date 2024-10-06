@@ -7,6 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="BusinessOnboarding\AskingUserForAdditionalInformations\" />
+    <Folder Include="BusinessOnboarding\ActivatingUserAccount\" />
+    <Folder Include="BusinessOnboarding\ProvidingAdditionalInformationsToApplication\" />
     <Folder Include="Business\" />
     <Folder Include="Catalogue\" />
     <Folder Include="Schedules\BusinessUnitsHierarchy\" />

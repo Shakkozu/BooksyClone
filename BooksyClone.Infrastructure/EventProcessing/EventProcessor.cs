@@ -30,11 +30,11 @@ public interface IEventHandler<TEvent>
     Task HandleAsync(TEvent @event, CancellationToken ct);
 }
 
-public abstract class InMemoryEventDispatcher<T> : IEventHandler<T> where T : class, INotification
+public abstract class InMemoryEventHandler<T> : IEventHandler<T> where T : class, INotification
 {
     private readonly IServiceProvider _serviceProvider;
 
-    public InMemoryEventDispatcher(IServiceProvider serviceProvider)
+    public InMemoryEventHandler(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
     }

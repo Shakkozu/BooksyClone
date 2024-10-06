@@ -1,6 +1,7 @@
 ﻿using Bogus;
 using Bogus.Extensions.Poland;
 using BooksyClone.Contract.BusinessOnboarding;
+using BooksyClone.Domain.BusinessOnboarding;
 using BooksyClone.Domain.BusinessOnboarding.FetchingBusinessCreationApplication;
 using BooksyClone.Domain.BusinessOnboarding.Model;
 using BooksyClone.Domain.BusinessOnboarding.RegisteringANewBusiness;

@@ -13,6 +13,8 @@ public static class OnboardingModule
     {
         serviceProvider.AddTransient<OnboardingFacade>();
         serviceProvider.AddQueryable<BusinessDraft, SqliteDbContext>();
+        serviceProvider.AddSingleton<OnboardingEventsStore>();
+        serviceProvider.AddSingleton<CurrentBusinessDraftFormProjection>();
 
     }
 
