@@ -48,6 +48,7 @@ public abstract class RabbitMQStreamsConsumer<T>: IHostedService where T: class
             Endpoints = [new IPEndPoint(IPAddress.Parse(_config.RabbitMQAddress), _config.RabbitMQPort),]
         };
         _streamSystem = await StreamSystem.Create(streamSystemConfig);
+        var streamCreated = false;
         if (!await _streamSystem.StreamExists(_config.StreamName))
         {
             await _streamSystem.CreateStream(new StreamSpec(_config.StreamName)
@@ -55,8 +56,10 @@ public abstract class RabbitMQStreamsConsumer<T>: IHostedService where T: class
                 MaxLengthBytes = 5_000_000_000
             });
         }
-
-        var offset = await _streamSystem.QueryOffset(_config.ConsumerName, _config.StreamName).ConfigureAwait(false);
+        
+        var offset = streamCreated 
+            ? 0
+            : await _streamSystem.QueryOffset(_config.ConsumerName, _config.StreamName).ConfigureAwait(false);
         var consumerConfig = new ConsumerConfig(_streamSystem, _config.StreamName)
         {
             Reference = _config.ConsumerName,
