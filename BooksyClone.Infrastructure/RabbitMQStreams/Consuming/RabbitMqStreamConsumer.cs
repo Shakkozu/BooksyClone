@@ -48,7 +48,6 @@ public abstract class RabbitMQStreamsConsumer<T>: IHostedService where T: class
             Endpoints = [new IPEndPoint(IPAddress.Parse(_config.RabbitMQAddress), _config.RabbitMQPort),]
         };
         _streamSystem = await StreamSystem.Create(streamSystemConfig);
-        var streamCreated = false;
         if (!await _streamSystem.StreamExists(_config.StreamName))
         {
             await _streamSystem.CreateStream(new StreamSpec(_config.StreamName)
@@ -56,14 +55,12 @@ public abstract class RabbitMQStreamsConsumer<T>: IHostedService where T: class
                 MaxLengthBytes = 5_000_000_000
             });
         }
-        
-        var offset = streamCreated 
-            ? 0
-            : await _streamSystem.QueryOffset(_config.ConsumerName, _config.StreamName).ConfigureAwait(false);
+
+
         var consumerConfig = new ConsumerConfig(_streamSystem, _config.StreamName)
         {
             Reference = _config.ConsumerName,
-            OffsetSpec = new OffsetTypeOffset(offset),
+            OffsetSpec = await GetOffsetType(_streamSystem).ConfigureAwait(false),
             MessageHandler = async (stream, consumer, messageContext, message) =>
             {
                 var messageStringContent = Encoding.UTF8.GetString(message.Data.Contents);
@@ -99,5 +96,23 @@ public abstract class RabbitMQStreamsConsumer<T>: IHostedService where T: class
             await _streamSystem.Close().ConfigureAwait(false);
 
         }
+    }
+
+    private async Task<IOffsetType> GetOffsetType(StreamSystem streamSystem)
+    {
+        try
+        {
+            var offset =  await streamSystem.QueryOffset(_config.ConsumerName, _config.StreamName).ConfigureAwait(false);
+            return new OffsetTypeOffset(offset);
+        }
+        catch (OffsetNotFoundException)
+        {
+            return new OffsetTypeFirst();
+        }
+        catch (Exception)
+        {
+            return new OffsetTypeFirst();
+        }
+
     }
 }
