@@ -5,26 +5,32 @@ using Microsoft.Extensions.Hosting;
 using System.Net;
 using Newtonsoft.Json;
 using Serilog;
+using Polly;
 
 namespace BooksyClone.Infrastructure.RabbitMQStreams.Consuming;
 
+public record RetryPolicy(int Attempts, Func<int, TimeSpan> RetryOffsetFunc)
+{
+    public static RetryPolicy Default => new RetryPolicy(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+}
 public record RabbitMQStreamConsumerConfiguration(
     string StreamName,
     string Username,
     string Password,
-    string ConsumerName,
+    string ConsumerName, 
+    RetryPolicy RetryPolicy,
     string RabbitMQAddress = "127.0.0.1",
     int RabbitMQPort = 5552,
     int ConnectionRetries = 3,
     bool ShouldCreateStreamIfNotExists = true,
     TimeSpan ConnectionTimeout = default
-)
+    )
 {
-    public RabbitMQStreamConsumerConfiguration(string streamName, string address, int port, string consumerName)
-        : this(streamName, "guest", "guest", consumerName, address, port, 3, true, TimeSpan.FromSeconds(10)) { }
+    public RabbitMQStreamConsumerConfiguration(string streamName, string address, int port, string consumerName, RetryPolicy retryPolicy)
+        : this(streamName, "guest", "guest", consumerName, retryPolicy, address, port, 3, true, TimeSpan.FromSeconds(10)) { }
 }
 
-public abstract class RabbitMQStreamsConsumer<T>: IHostedService where T: class
+public abstract class RabbitMQStreamsConsumer<T> : IHostedService where T : class
 {
     private readonly RabbitMQStreamConsumerConfiguration _config;
     private Consumer? _consumer;
@@ -65,18 +71,21 @@ public abstract class RabbitMQStreamsConsumer<T>: IHostedService where T: class
             {
                 var messageStringContent = Encoding.UTF8.GetString(message.Data.Contents);
                 var serializedMessage = JsonConvert.DeserializeObject<T>(messageStringContent);
-                if(serializedMessage == null)
+                var retryPolicy = Policy
+                    .Handle<Exception>()
+                    .WaitAndRetryAsync(_config.RetryPolicy.Attempts, _config.RetryPolicy.RetryOffsetFunc);
+                if (serializedMessage == null)
                     throw new InvalidCastException($"Deserialization of message {messageStringContent} failed casting to an object. Stream: {stream}, Index: {messageContext.Offset}, Timestamp: {messageContext.Timestamp}");
 
                 try
                 {
-                    await HandleAsync(serializedMessage).ConfigureAwait(false);
+                    await retryPolicy.ExecuteAsync(() => HandleAsync(serializedMessage)).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
                     Log.Error("Processing received message failed with error: {@error}. Stream: {stream}, offset: {offset}", e, stream, messageContext.Offset);
                 }
-                if(_consumed++ % 1000 == 0)
+                if (_consumed++ % 1000 == 0)
                     await consumer.StoreOffset(messageContext.Offset).ConfigureAwait(false);
 
             }
@@ -87,11 +96,11 @@ public abstract class RabbitMQStreamsConsumer<T>: IHostedService where T: class
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
-        if(_consumer != null)
+        if (_consumer != null)
         {
             await _consumer.Close().ConfigureAwait(false);
         }
-        if(_streamSystem != null)
+        if (_streamSystem != null)
         {
             await _streamSystem.Close().ConfigureAwait(false);
 
@@ -102,7 +111,7 @@ public abstract class RabbitMQStreamsConsumer<T>: IHostedService where T: class
     {
         try
         {
-            var offset =  await streamSystem.QueryOffset(_config.ConsumerName, _config.StreamName).ConfigureAwait(false);
+            var offset = await streamSystem.QueryOffset(_config.ConsumerName, _config.StreamName).ConfigureAwait(false);
             return new OffsetTypeOffset(offset);
         }
         catch (OffsetNotFoundException)
