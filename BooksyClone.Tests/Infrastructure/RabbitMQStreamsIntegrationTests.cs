@@ -72,7 +72,7 @@ internal class RabbitMQStreamsIntegrationTests
             .MustHaveHappenedOnceExactly();
     }
 
-    private class TestProducer : RabbitMqStreamProducer<TestRabbitMqStreamsMessage>
+    private class TestProducer : RabbitMqStreamProducer
     {
         public TestProducer(RabbitMQStreamProducerConfiguration config) : base(config)
         {

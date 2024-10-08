@@ -25,7 +25,7 @@ public record RabbitMQStreamProducerConfiguration(
 }
 
 
-public abstract class RabbitMqStreamProducer<T>  where T : class
+public abstract class RabbitMqStreamProducer
 {
     private readonly RabbitMQStreamProducerConfiguration _config;
     private DeduplicatingProducer? _deduplicatingProducer;
@@ -54,7 +54,7 @@ public abstract class RabbitMqStreamProducer<T>  where T : class
         _deduplicatingProducer = await DeduplicatingProducer.Create(producerConfig).ConfigureAwait(false);
     }
 
-    public virtual async Task Send(T message)
+    public virtual async Task Send<T>(T message)
     {
         if(_deduplicatingProducer == null)
             throw new InvalidOperationException("producer is not yet initialized");
