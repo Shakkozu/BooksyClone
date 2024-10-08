@@ -72,12 +72,6 @@ internal class RabbitMQStreamsIntegrationTests
             .MustHaveHappenedOnceExactly();
     }
 
-    private class TestProducer : RabbitMqStreamProducer
-    {
-        public TestProducer(RabbitMQStreamProducerConfiguration config) : base(config)
-        {
-        }
-    }
 }
 public record TestRabbitMqStreamsMessage(string Message, DateTime Timestamp);
 

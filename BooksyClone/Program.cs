@@ -2,7 +2,7 @@
 using Serilog;
 using BooksyClone.Domain.BusinessOnboarding;
 using BooksyClone.Domain.Storage;
-using SQLitePCL;
+using BooksyClone.Domain.Schedules;
 
 namespace BooksyClone;
 
@@ -18,6 +18,7 @@ public class Program
             .WriteTo.Console()
             .WriteTo.Debug()
             .CreateLogger();
+        var config = builder.Configuration;
         builder.Services.AddSerilog(Log.Logger);
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -25,6 +26,7 @@ public class Program
         builder.Services.AddSwaggerGen();
         builder.Services.InstallSqliteEntityFramework();
         builder.Services.InstallOnboardingModule();
+        builder.Services.InstallSchedulesModule(config);
         builder.Services.AddAntiforgery();
         builder.Host.UseSerilog(Log.Logger);
 
@@ -44,6 +46,7 @@ public class Program
         }
 
         app.InstallOnbardingModuleEndpoints();
+        app.InstallSchedulesModuleEndpoints();
 
         app.UseHttpsRedirection();
 
