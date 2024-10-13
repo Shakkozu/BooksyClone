@@ -1,5 +1,8 @@
-﻿using BooksyClone.Contract.BusinessOnboarding;
+﻿using BooksyClone.Domain.Schedules.DefiningSchedules;
+using BooksyClone.Domain.Schedules.FetchingEmployeeScheduleDetails;
 using BooksyClone.Domain.Schedules.FetchingEmployeesSchedules;
+using BooksyClone.Domain.Schedules.RegisteringNewBusinessUnit;
+using BooksyClone.Domain.Schedules.Storage;
 using BooksyClone.Infrastructure.RabbitMQStreams.Consuming;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -10,7 +13,12 @@ public static class SchedulesModule
 {
     public static void InstallSchedulesModule(this IServiceCollection serviceProvider, IConfiguration configuration)
     {
-        serviceProvider.AddTransient<SchedulesFacade>();
+        serviceProvider.AddTransient<SchedulesBuilder>();
+        serviceProvider.AddTransient<SchedulesFacade>(sp =>
+        {
+            var builder = sp.GetRequiredService<SchedulesBuilder>();
+            return builder.GetFacade();
+        });
         serviceProvider.Configure<RabbitMQStreamConsumerConfiguration>(configuration.GetSection("Schedules:RabbitMQ:BusinessUnitsIntegration"));
         var businessDraftConsumer = GetBusinessUnitsRabbitConfig(configuration);
         serviceProvider.AddHostedService(sp =>
@@ -18,6 +26,7 @@ public static class SchedulesModule
             return new NewBusinessDraftRegisteredConsumer(businessDraftConsumer,
                 sp.GetRequiredService<SchedulesFacade>());
         });
+        serviceProvider.AddTransient<IScheduleDefinitionRepository, EntityFrameworkScheduleDefinitionRepository>();
 
     }
 
@@ -25,6 +34,8 @@ public static class SchedulesModule
     public static IEndpointRouteBuilder InstallSchedulesModuleEndpoints(this IEndpointRouteBuilder endpoints)
     {
         endpoints.MapFetchEmployeesSchedulesEndpoint();
+        endpoints.MapDefineScheuduleEndpoint();
+        endpoints.MapFetchScheduleDetailsEndpoint();
         return endpoints;
 
     }
@@ -50,41 +61,4 @@ public static class SchedulesModule
         return businessDraftConsumer;
     }
 
-}
-
-internal class NewBusinessDraftRegisteredConsumer : RabbitMQStreamsConsumer<BusinessDraftRegisteredEvent>
-{
-    private readonly SchedulesFacade _schedulesFacade;
-
-    public NewBusinessDraftRegisteredConsumer(RabbitMQStreamConsumerConfiguration config,
-        SchedulesFacade schedulesFacade) : base(config)
-    {
-        _schedulesFacade = schedulesFacade;
-    }
-    protected override async Task HandleAsync(BusinessDraftRegisteredEvent message)
-    {
-        var command = new RegisterNewBusinesUnitCommand(message.BusinessUnitId, message.OwnerId);
-        await _schedulesFacade.RegisterNewBusinessUnit(command);
-    }
-}
-
-
-public class EmployeScheduleDto
-{
-    public Guid EmployeeId { get; set; }
-    public string YearMonth { get; set; } //format yyyy-MM
-    public IEnumerable<DailyScheduleDto> Schedule { get; set; }
-
-}
-public class MonthlyScheduleDto
-{
-    public IEnumerable<DailyScheduleDto> Schedule { get; set; }
-}
-
-
-public class DailyScheduleDto
-{
-    public DateOnly Date { get; set; }
-    public TimeOnly Starts { get; set; }
-    public TimeOnly End { get; set; }
 }

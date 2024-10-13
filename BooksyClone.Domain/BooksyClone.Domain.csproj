@@ -12,7 +12,6 @@
     <Folder Include="BusinessOnboarding\ProvidingAdditionalInformationsToApplication\" />
     <Folder Include="Business\" />
     <Folder Include="Catalogue\" />
-    <Folder Include="Schedules\RegisteringNewBusinessUnit\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -63,12 +63,7 @@ public class DailySchedule
         {
             return;
         }
-
-
-
     }
-
-
 }
 
 internal interface IDailyScheduleEvent
