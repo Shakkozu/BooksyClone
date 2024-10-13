@@ -66,7 +66,7 @@ internal class RabbitMQStreamsIntegrationTests
         var payload = new TestRabbitMqStreamsMessage("Dupa", DateTime.Now);
         await testProducer.Send(payload);
 
-        Task.Delay(500).Wait();
+        Task.Delay(50).Wait();
 
         A.CallTo(() => fakeDependency.Call(A<TestRabbitMqStreamsMessage>.That.IsEqualTo(payload)))
             .MustHaveHappenedOnceExactly();
