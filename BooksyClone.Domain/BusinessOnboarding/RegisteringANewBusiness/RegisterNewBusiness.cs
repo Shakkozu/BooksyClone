@@ -11,11 +11,6 @@ public static class RegisterNewBusinessRoute
 {
     public static IEndpointRouteBuilder MapRegisterNewBusinessEndpoint(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapPost("test", () =>
-        {
-            return Results.Ok();
-
-        });
         endpoints.MapPost("/api/v1/business", async (
             HttpContext context,
             HttpRequest request,
