@@ -1,4 +1,5 @@
-﻿using BooksyClone.Domain.Schedules.DefiningSchedules;
+﻿using BooksyClone.Contract.Schedules;
+using BooksyClone.Domain.Schedules.DefiningSchedules;
 using BooksyClone.Domain.Schedules.Shared;
 using BooksyClone.Domain.Storage;
 
@@ -29,11 +30,19 @@ internal class MonthlyScheduleDefinition : BaseEntity
         ModifiedAt = DateTime.Now;
     }
 
+    internal void Publish(Guid publishedBy)
+    {
+        PublishedBy = publishedBy;
+        Status = ScheduleDefinitionStatus.Published;
+        ModifiedAt = DateTime.Now;
+    }
+
     public int Year { get; set; }
     public int Month { get; set; }
     public ScheduleDefinitionStatus Status { get; set; }
     public Guid EmployeeId { get; set; }
     public Guid BusinessUnitId { get; set; }
+    public Guid? PublishedBy { get; set; }
     public IEnumerable<MonthlyScheduleDefinitionDto> Definition { get; set; }
     public DateTime ModifiedAt { get; set; }
 }

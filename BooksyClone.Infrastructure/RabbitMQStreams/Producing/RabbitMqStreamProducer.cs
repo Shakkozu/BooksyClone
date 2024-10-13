@@ -25,7 +25,11 @@ public record RabbitMQStreamProducerConfiguration(
 }
 
 
-public abstract class RabbitMqStreamProducer
+public interface IRabbitStreamProducer
+{
+    Task Send<T>(T message);
+}
+public abstract class RabbitMqStreamProducer : IRabbitStreamProducer
 {
     private readonly RabbitMQStreamProducerConfiguration _config;
     private DeduplicatingProducer? _deduplicatingProducer;

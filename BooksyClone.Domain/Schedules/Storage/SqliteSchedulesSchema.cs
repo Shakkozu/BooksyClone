@@ -1,4 +1,4 @@
-﻿using BooksyClone.Domain.Schedules.DefiningSchedules;
+﻿using BooksyClone.Contract.Schedules;
 using BooksyClone.Domain.Storage;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -25,6 +25,7 @@ internal static class SqliteSchedulesSchema
             builder.Property(x => x.ModifiedAt).IsRequired();
             builder.Property(x => x.EmployeeId).IsRequired();
             builder.Property(x => x.BusinessUnitId).IsRequired();
+            builder.Property(x => x.PublishedBy);
             builder.Property(x => x.Status).IsRequired().HasMaxLength(50);
 
             builder.HasAlternateKey(monthlySchedule => new

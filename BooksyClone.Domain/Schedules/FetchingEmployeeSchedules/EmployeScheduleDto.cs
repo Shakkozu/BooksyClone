@@ -1,4 +1,4 @@
-﻿using BooksyClone.Domain.Schedules.DefiningSchedules;
+﻿using BooksyClone.Contract.Schedules;
 
 namespace BooksyClone.Domain.Schedules.FetchingEmployeeSchedules;
 

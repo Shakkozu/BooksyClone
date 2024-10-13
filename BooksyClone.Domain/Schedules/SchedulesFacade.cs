@@ -1,29 +1,38 @@
-﻿using BooksyClone.Contract.Shared;
-using BooksyClone.Domain.Schedules.DefiningSchedules;
+﻿using BooksyClone.Contract.Schedules;
+using BooksyClone.Contract.Shared;
 using BooksyClone.Domain.Schedules.FetchingEmployeeScheduleDetails;
 using BooksyClone.Domain.Schedules.FetchingEmployeeSchedules;
+using BooksyClone.Domain.Schedules.PublishingSchedule;
 using BooksyClone.Domain.Schedules.RegisteringNewBusinessUnit;
 using BooksyClone.Domain.Schedules.Shared;
 using BooksyClone.Domain.Schedules.Storage;
+using BooksyClone.Infrastructure.RabbitMQStreams.Producing;
+using BooksyClone.Infrastructure.TimeManagement;
 
 namespace BooksyClone.Domain.Schedules;
 
 public class SchedulesFacade
 {
-    internal SchedulesFacade(IScheduleDefinitionRepository scheduleRepository)
+    internal SchedulesFacade(IScheduleDefinitionRepository scheduleRepository,
+        ISchedulesPublisher schedulesPublisher,
+        ITimeService timeService)
     {
         _scheduleRepository = scheduleRepository;
+        _schedulesPublisher = schedulesPublisher;
+        _timeService = timeService;
     }
     private static Dictionary<Guid, IEnumerable<Guid>> _businessesEmployeesMap = new(); //todo
     private readonly IScheduleDefinitionRepository _scheduleRepository;
+    private readonly ISchedulesPublisher _schedulesPublisher;
+    private readonly ITimeService _timeService;
 
-    internal async Task RegisterNewBusinessUnit(RegisterNewBusinesUnitCommand command)
+    public async Task RegisterNewBusinessUnit(RegisterNewBusinesUnitCommand command)
     {
         _businessesEmployeesMap[command.BusinessUnitId] = [command.OwnerId];
         await Task.CompletedTask;
     }
 
-    internal async Task DefineScheduleAsync(Guid businessUnitId, Guid employeeId, MonthlyScheduleDto dto, CancellationToken ct)
+    public async Task DefineScheduleAsync(Guid businessUnitId, Guid employeeId, MonthlyScheduleDto dto, CancellationToken ct)
     {
         var yearMonth = new YearMonth(dto.ScheduleDate);
         var schedules = await _scheduleRepository.FindAsync(businessUnitId, employeeId, yearMonth, ct);
@@ -39,7 +48,7 @@ public class SchedulesFacade
         await _scheduleRepository.SaveAsync(schedules, ct);
     }
 
-    internal async Task<PagedListResponse<EmployeScheduleDto>> FetchCompanyEmployeesSchedules(Guid companyIdentifier, Paging paging, CancellationToken ct)
+    public async Task<PagedListResponse<EmployeScheduleDto>> FetchCompanyEmployeesSchedules(Guid companyIdentifier, Paging paging, CancellationToken ct)
     {
         var result = await _scheduleRepository.FindByCompanyIdAsync(companyIdentifier, paging, ct);
         var employeesSchedules = result.Items.Select(x => new EmployeScheduleDto
@@ -54,7 +63,7 @@ public class SchedulesFacade
         return new PagedListResponse<EmployeScheduleDto>(employeesSchedules, paging.Page, paging.PageSize, result.TotalCount);
     }
 
-    internal async Task<FetchScheduleDefinitionDetailsResponse> FetchEmployeeScheduleDetailsAsync(Guid businessUnitId, Guid employeeId, YearMonth yearMonth, CancellationToken ct)
+    public async Task<FetchScheduleDefinitionDetailsResponse> FetchEmployeeScheduleDetailsAsync(Guid businessUnitId, Guid employeeId, YearMonth yearMonth, CancellationToken ct)
     {
         var schedule = await _scheduleRepository.FindAsync(businessUnitId, employeeId, yearMonth, ct);
         if (schedule == null)
@@ -66,5 +75,22 @@ public class SchedulesFacade
             Status = schedule.Status.ToString(),
             ScheduleDefinition = schedule.Definition
         };
+    }
+
+    internal async Task PublishScheduleAsync(Guid publishedBy, Guid businessUnitId, Guid employeeId, YearMonth yearMonth, CancellationToken ct)
+    {
+        var schedule = await _scheduleRepository.FindAsync(businessUnitId, employeeId, yearMonth, ct);
+        if (schedule == null)
+            throw new InvalidOperationException("not found");
+
+        // potential candidate for outbox pattern due to risk of failing after publicating an event
+        schedule.Publish(publishedBy);
+        await _schedulesPublisher.Send(new EmployeeSchedulePublishedEvent(
+            _timeService.Now,
+            employeeId,
+            businessUnitId,
+            yearMonth.ToString(),
+            schedule.Definition));
+        await _scheduleRepository.SaveAsync(schedule, ct);
     }
 }

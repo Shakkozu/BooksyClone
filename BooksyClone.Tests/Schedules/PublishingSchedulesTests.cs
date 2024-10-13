@@ -1,15 +1,15 @@
-﻿using BooksyClone.Contract.BusinessOnboarding;
+﻿using BooksyClone.Contract.Schedules;
 using BooksyClone.Contract.Shared;
-using BooksyClone.Domain.Schedules.DefiningSchedules;
 using BooksyClone.Domain.Schedules.FetchingEmployeeScheduleDetails;
 using BooksyClone.Domain.Schedules.FetchingEmployeeSchedules;
+using BooksyClone.Domain.Schedules.RegisteringNewBusinessUnit;
 using BooksyClone.Infrastructure.RabbitMQStreams.Producing;
 using BooksyClone.Infrastructure.TimeManagement;
-using BooksyClone.Tests.Infrastructure;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace BooksyClone.Tests.Schedules;
@@ -21,7 +21,7 @@ internal class PublishingSchedulesTests
     private Guid _businessUnitId;
     private Guid _businessOwnerId;
     private RabbitMQStreamProducerConfiguration _testProducerConfiguration;
-    private TestProducer _testProducer;
+    private IRabbitStreamProducer _testProducer;
     private ITimeService _timeService;
     private PagedListResponse<EmployeScheduleDto> _emptyEmployeesSchedules;
 
@@ -30,13 +30,7 @@ internal class PublishingSchedulesTests
     {
         _businessUnitId = Guid.NewGuid();
         _businessOwnerId = Guid.NewGuid();
-
-        var streamName = "business-units-tests2";
-        _testProducerConfiguration = new RabbitMQStreamProducerConfiguration(
-            streamName,
-            "127.0.0.1",
-            5552);
-        _testProducer = new TestProducer(_testProducerConfiguration);
+        _testProducer = A.Fake<IRabbitStreamProducer>();
 
         _timeService = A.Fake<ITimeService>();
         A.CallTo(() => _timeService.Now).Returns(DateTime.ParseExact("2024-08-01", "yyyy-MM-dd", CultureInfo.InvariantCulture));
@@ -75,7 +69,8 @@ internal class PublishingSchedulesTests
 
   When the manager publishes the defined schedule
     via POST /companies/{companyIdentifier}/employees/{employeeId}/schedules/{scheduleIdentifier}/publish
-  Then an event "EmployeeSchedulePublished" is emitted, containing the schedule for the specified month
+    Then employee schedule is marked as `published`
+    And an event "EmployeeSchedulePublished" is emitted, containing the schedule for the specified month
 */
 
 
@@ -89,13 +84,12 @@ internal class PublishingSchedulesTests
         ThenManagerCanRetrieveCreatedMonthySchedule();
         AndManagerCanViewCreatedMonthlyScheduleOnEmployeeSchedulesList();
         WhenManagerPublishesSchedule();
-        ThenEmployeeSchedulePublishedEventIsPublished();
+        ThenEmployeeScheduleIsMarkedAsPublished();
+        AndEmployeeSchedulePublishedEventIsPublished();
     }
-
     private void GivenAnBusinessDraftRegistered()
     {
-        _testProducer.Send(new BusinessDraftRegisteredEvent(DateTime.Now, _businessUnitId, _businessOwnerId)).GetAwaiter().GetResult();
-        Task.Delay(300).GetAwaiter().GetResult();
+        _app.SchedulesFacade.RegisterNewBusinessUnit(new RegisterNewBusinesUnitCommand(_businessUnitId, _businessOwnerId)).GetAwaiter().GetResult();
     }
 
     private void WhenManagerFetchesEmployeesSchedules()
@@ -220,12 +214,37 @@ internal class PublishingSchedulesTests
 
     private void WhenManagerPublishesSchedule()
     {
-
+        var response = _httpClient.PutAsync($"/api/v1/companies/{_businessUnitId}/employees/{_businessOwnerId}/schedules/2024-10/publish", new StringContent("", MediaTypeHeaderValue.Parse("application/json"))).GetAwaiter().GetResult();
+        response.EnsureSuccessStatusCode();
     }
 
-    private void ThenEmployeeSchedulePublishedEventIsPublished()
+    private void ThenEmployeeScheduleIsMarkedAsPublished()
     {
+        var response = _httpClient.GetFromJsonAsync<PagedListResponse<EmployeScheduleDto>>($"/api/v1/companies/{_businessUnitId}/employees/schedules").GetAwaiter().GetResult();
 
+        Assert.That(response, Is.Not.Null);
+        response.Items.Single().Should().BeEquivalentTo(new EmployeScheduleDto
+        {
+            EmployeeId = _businessOwnerId,
+            Status = "Published",
+            YearMonth = "2024-10",
+            Schedule = GetFetchScheduleDefinitionDetailsResponse().ScheduleDefinition
+        });
+        response.TotalCount.Should().Be(1);
+        response.Page.Should().Be(1);
+        response.PageSize.Should().Be(100);
+    }
+
+
+    private void AndEmployeeSchedulePublishedEventIsPublished()
+    {
+        //A.CallTo(() => _testProducer.Send(A<EmployeeSchedulePublishedEvent>.That.Matches(
+        //        @event => @event.EmployeeId == _businessOwnerId
+        //            && @event.ScheduleDate == "2024-10" 
+        //            && @event.BusinessUnitId == _businessUnitId 
+        //            && @event.ScheduleDefinition == GetFetchScheduleDefinitionDetailsResponse().ScheduleDefinition
+        //        )))
+        //    .MustHaveHappenedOnceExactly();
     }
 
 

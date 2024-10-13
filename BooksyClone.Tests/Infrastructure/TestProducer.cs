@@ -8,4 +8,3 @@ internal class TestProducer : RabbitMqStreamProducer
     {
     }
 }
-

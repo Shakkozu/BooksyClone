@@ -1,4 +1,4 @@
-﻿using BooksyClone.Domain.Schedules.DefiningSchedules;
+﻿using BooksyClone.Contract.Schedules;
 using BooksyClone.Domain.Schedules.Shared;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;

@@ -2,7 +2,7 @@
 
 namespace BooksyClone.Domain.Schedules.Shared;
 
-internal class YearMonth
+public class YearMonth
 {
     public YearMonth(string str)
     {
