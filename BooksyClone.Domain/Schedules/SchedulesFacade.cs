@@ -1,4 +1,4 @@
-﻿using BooksyClone.Domain.BusinessOnboarding.Model;
+﻿using BooksyClone.Contract.Shared;
 using BooksyClone.Domain.Schedules.DefiningSchedules;
 using BooksyClone.Domain.Schedules.FetchingEmployeeScheduleDetails;
 using BooksyClone.Domain.Schedules.FetchingEmployeeSchedules;
@@ -27,7 +27,7 @@ public class SchedulesFacade
     {
         var yearMonth = new YearMonth(dto.ScheduleDate);
         var schedules = await _scheduleRepository.FindAsync(businessUnitId, employeeId, yearMonth, ct);
-        if(schedules != null)
+        if (schedules != null)
         {
             schedules.Update(dto);
         }
@@ -39,14 +39,19 @@ public class SchedulesFacade
         await _scheduleRepository.SaveAsync(schedules, ct);
     }
 
-    internal IEnumerable<EmployeScheduleDto> FetchCompanyEmployeesSchedules(Guid companyIdentifier)
+    internal async Task<PagedListResponse<EmployeScheduleDto>> FetchCompanyEmployeesSchedules(Guid companyIdentifier, Paging paging, CancellationToken ct)
     {
-        return _businessesEmployeesMap[companyIdentifier].Select(employeeId =>
-            new EmployeScheduleDto {
-                EmployeeId = employeeId,
-                Schedule = [],
-                YearMonth = DateTime.Today.ToString("yyyy-MM")}
+        var result = await _scheduleRepository.FindByCompanyIdAsync(companyIdentifier, paging, ct);
+        var employeesSchedules = result.Items.Select(x => new EmployeScheduleDto
+        {
+            EmployeeId = x.EmployeeId,
+            Schedule = x.Definition,
+            Status = x.Status.ToString(),
+            YearMonth = $"{x.Year}-{x.Month}"
+        }
         );
+
+        return new PagedListResponse<EmployeScheduleDto>(employeesSchedules, paging.Page, paging.PageSize, result.TotalCount);
     }
 
     internal async Task<FetchScheduleDefinitionDetailsResponse> FetchEmployeeScheduleDetailsAsync(Guid businessUnitId, Guid employeeId, YearMonth yearMonth, CancellationToken ct)

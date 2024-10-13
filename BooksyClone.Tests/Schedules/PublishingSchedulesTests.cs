@@ -1,18 +1,14 @@
-﻿using Bogus;
-using BooksyClone.Contract.BusinessOnboarding;
-using BooksyClone.Contract.BusinessUnits;
+﻿using BooksyClone.Contract.BusinessOnboarding;
+using BooksyClone.Contract.Shared;
 using BooksyClone.Domain.Schedules.DefiningSchedules;
 using BooksyClone.Domain.Schedules.FetchingEmployeeScheduleDetails;
 using BooksyClone.Domain.Schedules.FetchingEmployeeSchedules;
-using BooksyClone.Infrastructure.RabbitMQStreams;
-using BooksyClone.Infrastructure.RabbitMQStreams.Consuming;
 using BooksyClone.Infrastructure.RabbitMQStreams.Producing;
 using BooksyClone.Infrastructure.TimeManagement;
 using BooksyClone.Tests.Infrastructure;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using System.Globalization;
 using System.Net.Http.Json;
 
@@ -20,8 +16,6 @@ namespace BooksyClone.Tests.Schedules;
 [TestFixture]
 internal class PublishingSchedulesTests
 {
-    private Guid _userId;
-    private Faker _generator;
     private BooksyCloneApp _app;
     private HttpClient _httpClient;
     private Guid _businessUnitId;
@@ -29,15 +23,13 @@ internal class PublishingSchedulesTests
     private RabbitMQStreamProducerConfiguration _testProducerConfiguration;
     private TestProducer _testProducer;
     private ITimeService _timeService;
-    private IEnumerable<EmployeScheduleDto> _emptyEmployeesSchedules;
+    private PagedListResponse<EmployeScheduleDto> _emptyEmployeesSchedules;
 
     [OneTimeSetUp]
     public void Setup()
     {
-        _userId = Guid.NewGuid();
         _businessUnitId = Guid.NewGuid();
         _businessOwnerId = Guid.NewGuid();
-        _generator = new Faker("pl");
 
         var streamName = "business-units-tests2";
         _testProducerConfiguration = new RabbitMQStreamProducerConfiguration(
@@ -108,14 +100,12 @@ internal class PublishingSchedulesTests
 
     private void WhenManagerFetchesEmployeesSchedules()
     {
-        _emptyEmployeesSchedules = _httpClient.GetFromJsonAsync<IEnumerable<EmployeScheduleDto>>($"/api/v1/companies/{_businessUnitId}/employees/schedules").GetAwaiter().GetResult() ?? throw new ArgumentNullException("emptyEmployeeslist");
+        _emptyEmployeesSchedules = _httpClient.GetFromJsonAsync<PagedListResponse<EmployeScheduleDto>>($"/api/v1/companies/{_businessUnitId}/employees/schedules").GetAwaiter().GetResult() ?? throw new ArgumentNullException("emptyEmployeeslist");
     }
 
     private void ThenEmptyListIsReturned()
     {
-        Assert.That(_emptyEmployeesSchedules.Single().YearMonth, Is.EqualTo(DateTime.Today.ToString("yyyy-MM")));
-        Assert.That(_emptyEmployeesSchedules.Single().EmployeeId, Is.EqualTo(_businessOwnerId));
-        Assert.That(_emptyEmployeesSchedules.Single().Schedule, Is.Empty);
+        Assert.That(_emptyEmployeesSchedules.Items, Is.Empty);
     }
 
     private void WhenManagerDefinesEmployeeMonthlySchedule()
@@ -213,7 +203,19 @@ internal class PublishingSchedulesTests
 
     private void AndManagerCanViewCreatedMonthlyScheduleOnEmployeeSchedulesList()
     {
+        var response = _httpClient.GetFromJsonAsync<PagedListResponse<EmployeScheduleDto>>($"/api/v1/companies/{_businessUnitId}/employees/schedules").GetAwaiter().GetResult();
 
+        Assert.That(response, Is.Not.Null);
+        response.Items.Single().Should().BeEquivalentTo(new EmployeScheduleDto
+        {
+            EmployeeId = _businessOwnerId,
+            Status = "Draft",
+            YearMonth = "2024-10",
+            Schedule = GetFetchScheduleDefinitionDetailsResponse().ScheduleDefinition
+        });
+        response.TotalCount.Should().Be(1);
+        response.Page.Should().Be(1);
+        response.PageSize.Should().Be(100);
     }
 
     private void WhenManagerPublishesSchedule()
@@ -227,76 +229,74 @@ internal class PublishingSchedulesTests
     }
 
 
-
-
     private FetchScheduleDefinitionDetailsResponse GetFetchScheduleDefinitionDetailsResponse()
     {
         var definition = new[]
         {
     new MonthlyScheduleDefinitionDto
     {
-        from = "2024-10-01",
-        to = "2024-10-04",
-        shifts = new[]
+        From = "2024-10-01",
+        To = "2024-10-04",
+        Shifts = new[]
         {
-            new ShiftDto { start = "09:00", end = "13:00" },
-            new ShiftDto { start = "15:00", end = "19:00" }
+            new ShiftDto { Start = "09:00", End = "13:00" },
+            new ShiftDto { Start = "15:00", End = "19:00" }
         },
-        description = ""
+        Description = ""
     },
     new MonthlyScheduleDefinitionDto
     {
-        from = "2024-10-05",
-        to = "2024-10-05",
-        shifts = new[]
+        From = "2024-10-05",
+        To = "2024-10-05",
+        Shifts = new[]
         {
-            new ShiftDto { start = "10:00", end = "16:00" }
+            new ShiftDto { Start = "10:00", End = "16:00" }
         },
-        description = ""
+        Description = ""
     },
     new MonthlyScheduleDefinitionDto
     {
-        from = "2024-10-06",
-        to = "2024-10-06",
-        shifts = Array.Empty<ShiftDto>(),
-        description = ""
+        From = "2024-10-06",
+        To = "2024-10-06",
+        Shifts = Array.Empty<ShiftDto>(),
+        Description = ""
     },
     new MonthlyScheduleDefinitionDto
     {
-        from = "2024-10-07",
-        to = "2024-10-13",
-        shifts = Array.Empty<ShiftDto>(),
-        description = "vacation"
+        From = "2024-10-07",
+        To = "2024-10-13",
+        Shifts = Array.Empty<ShiftDto>(),
+        Description = "vacation"
     },
     new MonthlyScheduleDefinitionDto
     {
-        from = "2024-10-14",
-        to = "2024-10-18",
-        shifts = new[]
+        From = "2024-10-14",
+        To = "2024-10-18",
+        Shifts = new[]
         {
-            new ShiftDto { start = "08:00", end = "17:00" }
+            new ShiftDto { Start = "08:00", End = "17:00" }
         },
-        description = ""
+        Description = ""
     },
     new MonthlyScheduleDefinitionDto
     {
-        from = "2024-10-21",
-        to = "2024-10-25",
-        shifts = new[]
+        From = "2024-10-21",
+        To = "2024-10-25",
+        Shifts = new[]
         {
-            new ShiftDto { start = "08:00", end = "17:00" }
+            new ShiftDto { Start = "08:00", End = "17:00" }
         },
-        description = ""
+        Description = ""
     },
     new MonthlyScheduleDefinitionDto
     {
-        from = "2024-10-28",
-        to = "2024-10-31",
-        shifts = new[]
+        From = "2024-10-28",
+        To = "2024-10-31",
+        Shifts = new[]
         {
-            new ShiftDto { start = "08:00", end = "17:00" }
+            new ShiftDto { Start = "08:00", End = "17:00" }
         },
-        description = ""
+        Description = ""
     }
 };
         var result = new FetchScheduleDefinitionDetailsResponse

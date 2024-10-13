@@ -11,7 +11,7 @@ internal class MonthlyScheduleDefinition : BaseEntity
     {
         // todo validaiton
         Guid = Guid.NewGuid();
-        Definition = schedule.scheduleDefinition;
+        Definition = schedule.ScheduleDefinition;
         Status = ScheduleDefinitionStatus.Draft;
         BusinessUnitId = businessUnitId;
         EmployeeId = employeeId;
@@ -25,7 +25,7 @@ internal class MonthlyScheduleDefinition : BaseEntity
         if (Status != ScheduleDefinitionStatus.Draft)
             throw new InvalidOperationException();
 
-        Definition = schedule.scheduleDefinition;
+        Definition = schedule.ScheduleDefinition;
         ModifiedAt = DateTime.Now;
     }
 

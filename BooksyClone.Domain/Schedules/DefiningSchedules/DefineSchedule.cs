@@ -28,19 +28,19 @@ public static class DefineScheuduleRoute
 public class MonthlyScheduleDto
 {
     public string ScheduleDate { get; set; }
-    public MonthlyScheduleDefinitionDto[] scheduleDefinition { get; set; } = [];
+    public MonthlyScheduleDefinitionDto[] ScheduleDefinition { get; set; } = [];
 }
 
 public class MonthlyScheduleDefinitionDto
 {
-    public string from { get; set; }
-    public string to { get; set; }
-    public ShiftDto[] shifts { get; set; } = [];
-    public string? description { get; set; }
+    public string From { get; set; }
+    public string To { get; set; }
+    public ShiftDto[] Shifts { get; set; } = [];
+    public string? Description { get; set; }
 }
 
 public class ShiftDto
 {
-    public string start { get; set; }
-    public string end { get; set; }
+    public string Start { get; set; }
+    public string End { get; set; }
 }
