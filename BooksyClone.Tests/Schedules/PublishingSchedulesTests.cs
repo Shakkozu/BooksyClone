@@ -2,13 +2,16 @@
 using BooksyClone.Contract.Shared;
 using BooksyClone.Domain.Schedules.FetchingEmployeeScheduleDetails;
 using BooksyClone.Domain.Schedules.FetchingEmployeeSchedules;
+using BooksyClone.Domain.Schedules.PublishingSchedule;
 using BooksyClone.Domain.Schedules.RegisteringNewBusinessUnit;
 using BooksyClone.Infrastructure.RabbitMQStreams.Producing;
 using BooksyClone.Infrastructure.TimeManagement;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using System.Globalization;
+using System.Linq;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
@@ -20,8 +23,7 @@ internal class PublishingSchedulesTests
     private HttpClient _httpClient;
     private Guid _businessUnitId;
     private Guid _businessOwnerId;
-    private RabbitMQStreamProducerConfiguration _testProducerConfiguration;
-    private IRabbitStreamProducer _testProducer;
+    private ISchedulesRabbitStreamsPublisher _testProducer;
     private ITimeService _timeService;
     private PagedListResponse<EmployeScheduleDto> _emptyEmployeesSchedules;
 
@@ -30,7 +32,7 @@ internal class PublishingSchedulesTests
     {
         _businessUnitId = Guid.NewGuid();
         _businessOwnerId = Guid.NewGuid();
-        _testProducer = A.Fake<IRabbitStreamProducer>();
+        _testProducer = A.Fake<ISchedulesRabbitStreamsPublisher>();
 
         _timeService = A.Fake<ITimeService>();
         A.CallTo(() => _timeService.Now).Returns(DateTime.ParseExact("2024-08-01", "yyyy-MM-dd", CultureInfo.InvariantCulture));
@@ -238,13 +240,15 @@ internal class PublishingSchedulesTests
 
     private void AndEmployeeSchedulePublishedEventIsPublished()
     {
-        //A.CallTo(() => _testProducer.Send(A<EmployeeSchedulePublishedEvent>.That.Matches(
-        //        @event => @event.EmployeeId == _businessOwnerId
-        //            && @event.ScheduleDate == "2024-10" 
-        //            && @event.BusinessUnitId == _businessUnitId 
-        //            && @event.ScheduleDefinition == GetFetchScheduleDefinitionDetailsResponse().ScheduleDefinition
-        //        )))
-        //    .MustHaveHappenedOnceExactly();
+        var expected = GetFetchScheduleDefinitionDetailsResponse().ScheduleDefinition.OrderBy(x => x.From).ToList();
+        A.CallTo(() => _testProducer.Send(A<EmployeeSchedulePublishedEvent>.That.Matches(@event =>
+                    @event.EmployeeId == _businessOwnerId
+                    && @event.ScheduleDate == "2024-10"
+                    && @event.BusinessUnitId == _businessUnitId
+                    && @event.ScheduleDefinition.Count() == expected.Count()
+                    && JsonConvert.SerializeObject(@event.ScheduleDefinition) == JsonConvert.SerializeObject(expected))
+                ))
+            .MustHaveHappenedOnceExactly();
     }
 
 

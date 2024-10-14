@@ -8,13 +8,13 @@ public record EmployeeSchedulePublishedEvent(
     );
 
 
-public class MonthlyScheduleDto
+public record MonthlyScheduleDto
 {
     public string ScheduleDate { get; set; }
     public MonthlyScheduleDefinitionDto[] ScheduleDefinition { get; set; } = [];
 }
 
-public class MonthlyScheduleDefinitionDto
+public record MonthlyScheduleDefinitionDto
 {
     public string From { get; set; }
     public string To { get; set; }
@@ -22,7 +22,7 @@ public class MonthlyScheduleDefinitionDto
     public string? Description { get; set; }
 }
 
-public class ShiftDto
+public record ShiftDto
 {
     public string Start { get; set; }
     public string End { get; set; }

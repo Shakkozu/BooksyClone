@@ -6,7 +6,6 @@ using BooksyClone.Domain.Schedules.PublishingSchedule;
 using BooksyClone.Domain.Schedules.RegisteringNewBusinessUnit;
 using BooksyClone.Domain.Schedules.Shared;
 using BooksyClone.Domain.Schedules.Storage;
-using BooksyClone.Infrastructure.RabbitMQStreams.Producing;
 using BooksyClone.Infrastructure.TimeManagement;
 
 namespace BooksyClone.Domain.Schedules;
@@ -14,7 +13,7 @@ namespace BooksyClone.Domain.Schedules;
 public class SchedulesFacade
 {
     internal SchedulesFacade(IScheduleDefinitionRepository scheduleRepository,
-        ISchedulesPublisher schedulesPublisher,
+        ISchedulesRabbitStreamsPublisher schedulesPublisher,
         ITimeService timeService)
     {
         _scheduleRepository = scheduleRepository;
@@ -23,7 +22,7 @@ public class SchedulesFacade
     }
     private static Dictionary<Guid, IEnumerable<Guid>> _businessesEmployeesMap = new(); //todo
     private readonly IScheduleDefinitionRepository _scheduleRepository;
-    private readonly ISchedulesPublisher _schedulesPublisher;
+    private readonly ISchedulesRabbitStreamsPublisher _schedulesPublisher;
     private readonly ITimeService _timeService;
 
     public async Task RegisterNewBusinessUnit(RegisterNewBusinesUnitCommand command)

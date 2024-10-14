@@ -32,7 +32,7 @@ public static class SchedulesModule
         });
         serviceProvider.AddTransient<IScheduleDefinitionRepository, EntityFrameworkScheduleDefinitionRepository>();
 
-        serviceProvider.AddSingleton<ISchedulesPublisher, SchedulesPublisher>(_ => new SchedulesPublisher(GetSchedulesProducerConfiguration(configuration)));
+        serviceProvider.AddSingleton<ISchedulesRabbitStreamsPublisher, SchedulesPublisher>(_ => new SchedulesPublisher(GetSchedulesProducerConfiguration(configuration)));
 
     }
 

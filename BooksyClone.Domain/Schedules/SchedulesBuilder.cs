@@ -7,11 +7,11 @@ namespace BooksyClone.Domain.Schedules;
 internal class SchedulesBuilder
 {
     private readonly IScheduleDefinitionRepository _repo;
-    private readonly ISchedulesPublisher _schedulesPublisher;
+    private readonly ISchedulesRabbitStreamsPublisher _schedulesPublisher;
     private readonly ITimeService _timeService;
 
     public SchedulesBuilder(IScheduleDefinitionRepository repo,
-        ISchedulesPublisher schedulesPublisher,
+        ISchedulesRabbitStreamsPublisher schedulesPublisher,
         ITimeService timeService)
     {
         _repo = repo;
