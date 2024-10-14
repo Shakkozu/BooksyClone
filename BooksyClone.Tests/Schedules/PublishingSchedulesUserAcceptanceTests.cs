@@ -21,7 +21,7 @@ internal class PublishingSchedulesUserAcceptanceTests
     private HttpClient _httpClient;
     private Guid _businessUnitId;
     private Guid _businessOwnerId;
-    private ISchedulesRabbitStreamsPublisher _testProducer;
+    private ISchedulesEventsPublisher _testProducer;
     private ITimeService _timeService;
     private PagedListResponse<EmployeScheduleDto> _emptyEmployeesSchedules;
 
@@ -30,7 +30,7 @@ internal class PublishingSchedulesUserAcceptanceTests
     {
         _businessUnitId = Guid.NewGuid();
         _businessOwnerId = Guid.NewGuid();
-        _testProducer = A.Fake<ISchedulesRabbitStreamsPublisher>();
+        _testProducer = A.Fake<ISchedulesEventsPublisher>();
 
         _timeService = A.Fake<ITimeService>();
         A.CallTo(() => _timeService.Now).Returns(DateTime.ParseExact("2024-08-01", "yyyy-MM-dd", CultureInfo.InvariantCulture));

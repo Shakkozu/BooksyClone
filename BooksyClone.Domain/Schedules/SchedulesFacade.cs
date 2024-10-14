@@ -13,7 +13,7 @@ namespace BooksyClone.Domain.Schedules;
 public class SchedulesFacade
 {
     internal SchedulesFacade(IScheduleDefinitionRepository scheduleRepository,
-        ISchedulesRabbitStreamsPublisher schedulesPublisher,
+        ISchedulesEventsPublisher schedulesPublisher,
         ITimeService timeService)
     {
         _scheduleRepository = scheduleRepository;
@@ -22,7 +22,7 @@ public class SchedulesFacade
     }
     private static Dictionary<Guid, IEnumerable<Guid>> _businessesEmployeesMap = new(); //todo
     private readonly IScheduleDefinitionRepository _scheduleRepository;
-    private readonly ISchedulesRabbitStreamsPublisher _schedulesPublisher;
+    private readonly ISchedulesEventsPublisher _schedulesPublisher;
     private readonly ITimeService _timeService;
 
     public async Task RegisterNewBusinessUnit(RegisterNewBusinesUnitCommand command)

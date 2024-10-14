@@ -25,7 +25,7 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.InstallSqliteEntityFramework();
-        builder.Services.InstallOnboardingModule();
+        builder.Services.InstallOnboardingModule(config);
         builder.Services.InstallSchedulesModule(config);
         builder.Services.AddAntiforgery();
         builder.Host.UseSerilog(Log.Logger);

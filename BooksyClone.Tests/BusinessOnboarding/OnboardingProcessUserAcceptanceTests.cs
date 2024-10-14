@@ -19,7 +19,7 @@ public class OnboardingProcessUserAcceptanceTests
 {
     private const string _legalConsent = "Oświadczam że wprowadzone przeze mnie dane są poprawne i zgodne z stanem faktycznym.";
     private Faker _generator;
-    private IEventPublisher _fakeEventPublisher;
+    private IOnboardingEventsPublisher _fakeEventPublisher;
     private BooksyCloneApp _app;
     private RegisterNewBusinessRequest _request;
     private IFormFile _businessProofDocument;
@@ -34,10 +34,10 @@ public class OnboardingProcessUserAcceptanceTests
     {
         _userId = Guid.NewGuid();
         _generator = new Faker("pl");
-        _fakeEventPublisher = A.Fake<IEventPublisher>();
+        _fakeEventPublisher = A.Fake<IOnboardingEventsPublisher>();
         _app = BooksyCloneApp.CreateInstance(services =>
         {
-            services.AddSingleton<IEventPublisher>(_fakeEventPublisher);
+            services.AddSingleton<IOnboardingEventsPublisher>(_fakeEventPublisher);
         });
     }
 
@@ -169,12 +169,11 @@ public class OnboardingProcessUserAcceptanceTests
             _businessDraftId,
             _request.UserId
             );
-        A.CallTo(() => _fakeEventPublisher.PublishAsync(A<BusinessDraftRegisteredEvent>.That.Matches(
+        A.CallTo(() => _fakeEventPublisher.SendBusinessDraftRegisteredEventAsync(A<BusinessDraftRegisteredEvent>.That.Matches(
             ev => ev.BusinessUnitId == _businessDraftId
             && ev.OwnerId == _request.UserId
             && ev.RegisteredAt.Date == DateTime.Now.Date
-            ),
-            A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            ))).MustHaveHappenedOnceExactly();
 
     }
 

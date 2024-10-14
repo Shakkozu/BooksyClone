@@ -11,13 +11,13 @@ namespace BooksyClone.Domain.BusinessOnboarding;
 internal class OnboardingFacade
 {
     private readonly SqliteDbContext _dbContext;
-    private readonly IEventPublisher _eventPublisher;
+    private readonly IOnboardingEventsPublisher _onboardingEventsPublisher;
 
     public OnboardingFacade(SqliteDbContext dbContext,
-        IEventPublisher eventPublisher)
+        IOnboardingEventsPublisher onboardingEventsPublisher)
     {
         _dbContext = dbContext;
-        _eventPublisher = eventPublisher;
+        _onboardingEventsPublisher = onboardingEventsPublisher;
     }
     internal async Task<Guid> RegisterNewBusinessDraftAsync(BusinessDraft businessDraft,
         CancellationToken ct)
@@ -27,7 +27,7 @@ internal class OnboardingFacade
             businessDraft.Guid,
             businessDraft.UserDetails.Guid);
 
-        await _eventPublisher.PublishAsync(draftPublishedEvent, ct);
+        await _onboardingEventsPublisher.SendBusinessDraftRegisteredEventAsync(draftPublishedEvent);
         return businessDraft.Guid;
     }
 

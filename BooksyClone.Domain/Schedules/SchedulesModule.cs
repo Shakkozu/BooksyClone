@@ -10,7 +10,6 @@ using BooksyClone.Infrastructure.TimeManagement;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection.Metadata.Ecma335;
 
 namespace BooksyClone.Domain.Schedules;
 public static class SchedulesModule
@@ -19,7 +18,7 @@ public static class SchedulesModule
     {
         serviceProvider.AddSingleton<ITimeService, TimeService>();
         serviceProvider.AddTransient<SchedulesBuilder>();
-        serviceProvider.AddTransient<SchedulesFacade>(sp =>
+        serviceProvider.AddTransient(sp =>
         {
             var builder = sp.GetRequiredService<SchedulesBuilder>();
             return builder.GetFacade();
@@ -32,7 +31,7 @@ public static class SchedulesModule
         });
         serviceProvider.AddTransient<IScheduleDefinitionRepository, EntityFrameworkScheduleDefinitionRepository>();
 
-        serviceProvider.AddSingleton<ISchedulesRabbitStreamsPublisher, SchedulesPublisher>(_ => new SchedulesPublisher(GetSchedulesProducerConfiguration(configuration)));
+        serviceProvider.AddSingleton<ISchedulesEventsPublisher, SchedulesPublisher>(_ => new SchedulesPublisher(GetSchedulesProducerConfiguration(configuration)));
 
     }
 

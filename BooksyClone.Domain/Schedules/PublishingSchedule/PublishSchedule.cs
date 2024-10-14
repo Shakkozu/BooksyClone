@@ -33,12 +33,12 @@ public static class PublishScheduleRoute
     }
 }
 
-public interface ISchedulesRabbitStreamsPublisher : IRabbitStreamProducer
+public interface ISchedulesEventsPublisher : IRabbitStreamProducer
 {
     Task Send(EmployeeSchedulePublishedEvent @event);
 }
 
-internal class SchedulesPublisher : RabbitMqStreamProducer, ISchedulesRabbitStreamsPublisher
+internal class SchedulesPublisher : RabbitMqStreamProducer, ISchedulesEventsPublisher
 {
     public SchedulesPublisher(RabbitMQStreamProducerConfiguration config) : base(config)
     {
