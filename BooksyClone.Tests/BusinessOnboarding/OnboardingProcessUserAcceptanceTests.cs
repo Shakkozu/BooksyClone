@@ -15,7 +15,7 @@ using System.Net.Http.Json;
 
 namespace BooksyClone.Tests.BusinessOnboarding;
 [TestFixture]
-public class OnboardingProcessTests
+public class OnboardingProcessUserAcceptanceTests
 {
     private const string _legalConsent = "Oświadczam że wprowadzone przeze mnie dane są poprawne i zgodne z stanem faktycznym.";
     private Faker _generator;

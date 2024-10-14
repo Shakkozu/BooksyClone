@@ -4,20 +4,18 @@ using BooksyClone.Domain.Schedules.FetchingEmployeeScheduleDetails;
 using BooksyClone.Domain.Schedules.FetchingEmployeeSchedules;
 using BooksyClone.Domain.Schedules.PublishingSchedule;
 using BooksyClone.Domain.Schedules.RegisteringNewBusinessUnit;
-using BooksyClone.Infrastructure.RabbitMQStreams.Producing;
 using BooksyClone.Infrastructure.TimeManagement;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System.Globalization;
-using System.Linq;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace BooksyClone.Tests.Schedules;
 [TestFixture]
-internal class PublishingSchedulesTests
+internal class PublishingSchedulesUserAcceptanceTests
 {
     private BooksyCloneApp _app;
     private HttpClient _httpClient;
