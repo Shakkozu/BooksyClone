@@ -14,21 +14,22 @@ public class SchedulesFacade
 {
     internal SchedulesFacade(IScheduleDefinitionRepository scheduleRepository,
         ISchedulesEventsPublisher schedulesPublisher,
+        ISchedulesBusinessEmployesRepository schedulesBusinessEmployesRepository,
         ITimeService timeService)
     {
         _scheduleRepository = scheduleRepository;
         _schedulesPublisher = schedulesPublisher;
+        _schedulesBusinessEmployesRepository = schedulesBusinessEmployesRepository;
         _timeService = timeService;
     }
-    private static Dictionary<Guid, IEnumerable<Guid>> _businessesEmployeesMap = new(); //todo
     private readonly IScheduleDefinitionRepository _scheduleRepository;
     private readonly ISchedulesEventsPublisher _schedulesPublisher;
+    private readonly ISchedulesBusinessEmployesRepository _schedulesBusinessEmployesRepository;
     private readonly ITimeService _timeService;
 
-    public async Task RegisterNewBusinessUnit(RegisterNewBusinesUnitCommand command)
+    public async Task RegisterNewBusinessUnit(RegisterNewBusinesUnitCommand command, CancellationToken ct)
     {
-        _businessesEmployeesMap[command.BusinessUnitId] = [command.OwnerId];
-        await Task.CompletedTask;
+        await _schedulesBusinessEmployesRepository.RegisterNewBusinessUnit(command.BusinessUnitId, [command.OwnerId], ct);
     }
 
     public async Task DefineScheduleAsync(Guid businessUnitId, Guid employeeId, MonthlyScheduleDto dto, CancellationToken ct)
@@ -37,6 +38,7 @@ public class SchedulesFacade
         var schedules = await _scheduleRepository.FindAsync(businessUnitId, employeeId, yearMonth, ct);
         if (schedules != null)
         {
+            // todo fetch employees assigned to business unit
             schedules.Update(dto);
         }
         else

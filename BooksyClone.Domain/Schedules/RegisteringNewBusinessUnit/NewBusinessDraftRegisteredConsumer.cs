@@ -15,6 +15,6 @@ internal class NewBusinessDraftRegisteredConsumer : RabbitMQStreamsConsumer<Busi
     protected override async Task HandleAsync(BusinessDraftRegisteredEvent message)
     {
         var command = new RegisterNewBusinesUnitCommand(message.BusinessUnitId, message.OwnerId);
-        await _schedulesFacade.RegisterNewBusinessUnit(command);
+        await _schedulesFacade.RegisterNewBusinessUnit(command, CancellationToken.None);
     }
 }

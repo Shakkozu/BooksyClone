@@ -50,5 +50,6 @@ public class SqliteDbContext : DbContext
 
     internal DbSet<BusinessDraft> BusinessDrafts { get; set; }
     internal DbSet<MonthlyScheduleDefinition> MonthlySchedules{ get; set; }
+    internal DbSet<ScheduleBusinessUnit> ScheduleBusiness { get; set; }
 
 }

@@ -36,6 +36,23 @@ internal static class SqliteSchedulesSchema
                 monthlySchedule.BusinessUnitId
             });
         });
+
+        modelBuilder.Entity<ScheduleBusinessUnit>(builder =>
+        {
+            builder.MapBaseEntityProperties();
+            builder.Property(x => x.BusinessUnitId).IsRequired();
+            builder.Property(x => x.EmployeesIds).HasConversion
+            (
+                v => JsonConvert.SerializeObject(v),
+                v => JsonConvert.DeserializeObject<IEnumerable<Guid>>(v));
+        });
     }
 
+}
+
+internal class ScheduleBusinessUnit : BaseEntity
+{
+    public Guid BusinessUnitId { get; set; }
+
+    public IEnumerable<Guid> EmployeesIds { get; set; }
 }
