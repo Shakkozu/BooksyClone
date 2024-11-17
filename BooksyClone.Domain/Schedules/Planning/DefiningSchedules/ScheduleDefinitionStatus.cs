@@ -1,4 +1,4 @@
-﻿namespace BooksyClone.Domain.Schedules.DefiningSchedules;
+﻿namespace BooksyClone.Domain.Schedules.Planning.DefiningSchedules;
 
 internal enum ScheduleDefinitionStatus
 {

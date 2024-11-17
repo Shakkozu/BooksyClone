@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
-namespace BooksyClone.Domain.Schedules.DefiningSchedules;
+namespace BooksyClone.Domain.Schedules.Planning.DefiningSchedules;
 
 public static class DefineScheuduleRoute
 {

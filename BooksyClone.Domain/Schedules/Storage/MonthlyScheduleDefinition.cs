@@ -1,5 +1,5 @@
 ﻿using BooksyClone.Contract.Schedules;
-using BooksyClone.Domain.Schedules.DefiningSchedules;
+using BooksyClone.Domain.Schedules.Planning.DefiningSchedules;
 using BooksyClone.Domain.Schedules.Shared;
 using BooksyClone.Domain.Storage;
 

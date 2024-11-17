@@ -1,7 +1,7 @@
-﻿using BooksyClone.Domain.Schedules.DefiningSchedules;
-using BooksyClone.Domain.Schedules.FetchingEmployeeScheduleDetails;
-using BooksyClone.Domain.Schedules.FetchingEmployeesSchedules;
-using BooksyClone.Domain.Schedules.PublishingSchedule;
+﻿using BooksyClone.Domain.Schedules.FetchingEmployeesSchedules;
+using BooksyClone.Domain.Schedules.Planning.DefiningSchedules;
+using BooksyClone.Domain.Schedules.Planning.FetchingEmployeeScheduleDetails;
+using BooksyClone.Domain.Schedules.Publishing.PublishingSchedule;
 using BooksyClone.Domain.Schedules.RegisteringNewBusinessUnit;
 using BooksyClone.Domain.Schedules.Storage;
 using BooksyClone.Infrastructure.RabbitMQStreams.Consuming;

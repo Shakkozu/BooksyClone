@@ -1,8 +1,8 @@
 ﻿using BooksyClone.Contract.Schedules;
 using BooksyClone.Contract.Shared;
-using BooksyClone.Domain.Schedules.FetchingEmployeeScheduleDetails;
 using BooksyClone.Domain.Schedules.FetchingEmployeeSchedules;
-using BooksyClone.Domain.Schedules.PublishingSchedule;
+using BooksyClone.Domain.Schedules.Planning.FetchingEmployeeScheduleDetails;
+using BooksyClone.Domain.Schedules.Publishing.PublishingSchedule;
 using BooksyClone.Domain.Schedules.RegisteringNewBusinessUnit;
 using BooksyClone.Domain.Schedules.Shared;
 using BooksyClone.Domain.Schedules.Storage;

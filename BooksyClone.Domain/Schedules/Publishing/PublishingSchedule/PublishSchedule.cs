@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 
-namespace BooksyClone.Domain.Schedules.PublishingSchedule;
+namespace BooksyClone.Domain.Schedules.Publishing.PublishingSchedule;
 public static class PublishScheduleRoute
 {
     public static string Path = "companies/{businessUnitId}/employees/{employeeId}/schedules/{yearMonth}/publish";

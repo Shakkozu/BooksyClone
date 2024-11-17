@@ -3,7 +3,7 @@ using BooksyClone.Domain.Schedules.Shared;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
-namespace BooksyClone.Domain.Schedules.FetchingEmployeeScheduleDetails;
+namespace BooksyClone.Domain.Schedules.Planning.FetchingEmployeeScheduleDetails;
 public static class FetchScheuduleDetailsRoute
 {
     public static string Path = "companies/{businessUnitId}/employees/{employeeId}/schedules/{scheduleDate}";

@@ -1,8 +1,8 @@
 ﻿using BooksyClone.Contract.Schedules;
 using BooksyClone.Contract.Shared;
-using BooksyClone.Domain.Schedules.FetchingEmployeeScheduleDetails;
 using BooksyClone.Domain.Schedules.FetchingEmployeeSchedules;
-using BooksyClone.Domain.Schedules.PublishingSchedule;
+using BooksyClone.Domain.Schedules.Planning.FetchingEmployeeScheduleDetails;
+using BooksyClone.Domain.Schedules.Publishing.PublishingSchedule;
 using BooksyClone.Domain.Schedules.RegisteringNewBusinessUnit;
 using BooksyClone.Infrastructure.TimeManagement;
 using FakeItEasy;
@@ -89,7 +89,7 @@ internal class PublishingSchedulesUserAcceptanceTests
     }
     private void GivenAnBusinessDraftRegistered()
     {
-        _app.SchedulesFacade.RegisterNewBusinessUnit(new RegisterNewBusinesUnitCommand(_businessUnitId, _businessOwnerId)).GetAwaiter().GetResult();
+        _app.SchedulesFacade.RegisterNewBusinessUnit(new RegisterNewBusinesUnitCommand(_businessUnitId, _businessOwnerId), CancellationToken.None).GetAwaiter().GetResult();
     }
 
     private void WhenManagerFetchesEmployeesSchedules()
