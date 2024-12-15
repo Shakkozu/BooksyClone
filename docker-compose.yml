@@ -21,3 +21,11 @@ services:
     - ./logs:/var/log/rabbitmq
     command: >
       sh -c "rabbitmq-plugins enable rabbitmq_stream rabbitmq_management"
+  postgres-db:
+    image: postgres:17.2
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: booksyclone
