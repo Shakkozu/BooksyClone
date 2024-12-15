@@ -1,0 +1,42 @@
+﻿using BooksyClone.Contract.Availability;
+using BooksyClone.Domain.Availability.Storage;
+using BooksyClone.Infrastructure.TimeManagement;
+using Dapper;
+
+namespace BooksyClone.Domain.Availability.LockingTimeslotOnResource;
+
+internal class GenerateLock
+{
+    private readonly DbConnectionFactory _dbConnectionFactory;
+    private readonly ITimeService _timeService;
+
+    public GenerateLock(DbConnectionFactory dbConnectionFactory, ITimeService timeService)
+    {
+        _dbConnectionFactory = dbConnectionFactory;
+        _timeService = timeService;
+    }
+
+    internal async Task<Result> Handle(GenerateNewLockRequest request)
+    {
+        var sql = @"
+INSERT INTO resource_lock (resource_id, created_by, timestamp, ""from"", ""to"")
+VALUES (@ResourceId, @CreatedBy, @Timestamp, @From, @To)";
+        using var connection = _dbConnectionFactory.CreateConnection();
+        connection.Open();
+
+        var dao = new
+        {
+            ResourceId = request.CorrelationId,
+            CreatedBy = request.OwnerId,
+            Timestamp = _timeService.Now,
+            From = request.Start,
+            To = request.End
+        };
+
+        var result = await connection.ExecuteAsync(sql, dao);
+        if (result == 1)
+            return Result.Correct();
+
+        throw new InvalidOperationException("something wrong, no data inserted");
+    }
+}
