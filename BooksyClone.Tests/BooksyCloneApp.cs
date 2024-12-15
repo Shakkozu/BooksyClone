@@ -2,8 +2,12 @@
 
 
 
+using BooksyClone.Domain.Availability;
 using BooksyClone.Domain.Schedules;
 using BooksyClone.Infrastructure.RabbitMQStreams;
+using BooksyClone.Infrastructure.TimeManagement;
+using BooksyClone.Tests.Availability;
+using FakeItEasy;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +21,7 @@ public class BooksyCloneApp : WebApplicationFactory<Program>
     private bool _reuseScope;
     private string _token;
     private readonly Action<IServiceCollection> _customization;
+    private ITimeService _timeService;
     private BooksyCloneApp(Action<IServiceCollection> customization, bool reuseScope = false)
     {
         _customization = customization;
@@ -48,6 +53,9 @@ public class BooksyCloneApp : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        _timeService = A.Fake<ITimeService>();
+        UpdateCurrentAppTime(DateTime.Now);
+
         base.ConfigureWebHost(builder);
         builder.ConfigureAppConfiguration(configurationBuilder =>
         {
@@ -55,6 +63,8 @@ public class BooksyCloneApp : WebApplicationFactory<Program>
         });
         builder.ConfigureServices(collection =>
         {
+            collection.AddSingleton<ITimeService>(_timeService);
+            collection.AddSingleton<AvailabilityFixture>();
 
         });
 
@@ -66,9 +76,20 @@ public class BooksyCloneApp : WebApplicationFactory<Program>
     internal IEventPublisher GetEventPublisher => RequestScope().ServiceProvider.GetRequiredService<IEventPublisher>();
     internal SchedulesFacade SchedulesFacade => RequestScope().ServiceProvider.GetRequiredService<SchedulesFacade>();
 
+    internal AvailabilityFacade AvailabilityFacade => RequestScope().ServiceProvider.GetRequiredService<AvailabilityFacade>();
+    internal AvailabilityFixture AvailabilityFixture => RequestScope().ServiceProvider.GetRequiredService<AvailabilityFixture>();
+    internal ITimeService ITimeService => RequestScope().ServiceProvider.GetRequiredService<ITimeService>();
+
     public HttpClient CreateHttpClient()
     {
         return CreateClient();
+    }
+
+    internal void UpdateCurrentAppTime(DateTime currentTime)
+    {
+        A.CallTo(() => _timeService.UtcNow).Returns(currentTime.ToUniversalTime());
+        A.CallTo(() => _timeService.Now).Returns(currentTime);
+        A.CallTo(() => _timeService.Today).Returns(currentTime.Date);
     }
 
     public enum UserType

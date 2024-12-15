@@ -19,7 +19,7 @@ public class AddResourcesTable : Migration
 
         // Utwórz tabelę resource
         Create.Table("resource")
-            .WithColumn("id").AsInt64().PrimaryKey()
+            .WithColumn("id").AsInt64().PrimaryKey().Identity()
             .WithColumn("guid").AsGuid().NotNullable().Unique().WithDefaultValue(SystemMethods.NewSequentialId)
             .WithColumn("correlation_id").AsGuid().NotNullable().Unique()
             .WithColumn("owner_id").AsGuid().NotNullable()
