@@ -1,5 +1,6 @@
 ﻿using BooksyClone.Contract.Availability;
 using BooksyClone.Domain.Availability.Storage;
+using BooksyClone.Domain.Schedules;
 using BooksyClone.Infrastructure.TimeManagement;
 using Dapper;
 
@@ -18,6 +19,7 @@ internal class GenerateLock
 
     internal async Task<Result> Handle(GenerateNewLockRequest request)
     {
+        var timerange = TimeSlot.FromDates(request.Start, request.End);
         var sql = @"
 INSERT INTO resource_lock (resource_id, created_by, timestamp, ""from"", ""to"")
 VALUES (@ResourceId, @CreatedBy, @Timestamp, @From, @To)";
@@ -29,8 +31,8 @@ VALUES (@ResourceId, @CreatedBy, @Timestamp, @From, @To)";
             ResourceId = request.CorrelationId,
             CreatedBy = request.OwnerId,
             Timestamp = _timeService.Now,
-            From = request.Start,
-            To = request.End
+            From = timerange.From,
+            To = timerange.To
         };
 
         var result = await connection.ExecuteAsync(sql, dao);

@@ -141,9 +141,19 @@ public class LockingTermsAcceptanceTests
     }
 
     [Test]
-    [Ignore("not implemeneted yet")]
     public async Task CannotCreateTimeslotWithDdateFromAfterDateTo()
     {
+        await _fixture.GenerateNewResourceViaCorrelationId(_resourceAId);
+        var currentTime = DateTime.ParseExact("2024-12-15T10:00:00", "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
+        _app.UpdateCurrentAppTime(currentTime);
+
+        var incorrectTimerange = new DateTimePair
+        {
+            Start = DateTime.ParseExact("15-12-2024T13:00:00", "dd-MM-yyyyTHH:mm:ss", CultureInfo.InvariantCulture),
+            End = DateTime.ParseExact("15-12-2024T12:30:00", "dd-MM-yyyyTHH:mm:ss", CultureInfo.InvariantCulture)
+        };
+
+        Assert.ThrowsAsync<ArgumentException>(async () => await _facade.GenerateLockAsync(GenerateRequestFromDateTimes(incorrectTimerange)));
     }
 
     [Test]
