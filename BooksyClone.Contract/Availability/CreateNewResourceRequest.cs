@@ -10,10 +10,8 @@ public record CreateNewResourceRequest(
     Guid OwnerId
     );
 
-
 public record GenerateNewLockRequest(
     Guid CorrelationId,
     Guid OwnerId,
     DateTime Start,
     DateTime End);
-
