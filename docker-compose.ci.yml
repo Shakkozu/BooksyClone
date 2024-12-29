@@ -14,7 +14,7 @@ services:
   postgres-db:
     image: postgres:17.2
     ports:
-      - "5432:5432"
+      - "25432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root

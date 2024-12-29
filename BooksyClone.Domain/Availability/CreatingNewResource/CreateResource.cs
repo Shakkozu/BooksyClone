@@ -17,7 +17,7 @@ internal class CreateNewResource
 
     internal async Task Handle(CreateNewResourceRequest request)
     {
-        var sql = @"
+        const string sql = @"
             INSERT INTO resource (guid, correlation_id, owner_id, created_at)
             VALUES (@Guid, @CorrelationId, @OwnerId, @CreatedAt)";
         using var connection = _dbConnectionFactory.CreateConnection();
@@ -32,6 +32,4 @@ internal class CreateNewResource
         };
         await connection.ExecuteAsync(sql, resource);
     }
-
-
 }
