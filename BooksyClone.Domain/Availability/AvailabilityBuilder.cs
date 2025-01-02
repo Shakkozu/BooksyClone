@@ -1,6 +1,7 @@
 ﻿using BooksyClone.Domain.Availability.CreatingNewResource;
 using BooksyClone.Domain.Availability.LockingTimeslotOnResource;
 using BooksyClone.Domain.Availability.Storage;
+using BooksyClone.Domain.Availability.UpdatingResourceLockingPolicy;
 using BooksyClone.Infrastructure.TimeManagement;
 using Microsoft.Extensions.Configuration;
 
@@ -24,8 +25,11 @@ internal class AvailabilityBuilder
     {
         return new AvailabilityFacade(
             new CreateNewResource(_dbConnectionFactory),
-            new GenerateLock(_dbConnectionFactory, _timeService)
-            );
+            new GenerateLock(_dbConnectionFactory, _timeService),
+			new UpdateResourcePolicy(_dbConnectionFactory, _timeService),
+			new GetResourcePolicies(_dbConnectionFactory)
+
+			);
     }
 
 

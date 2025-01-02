@@ -1,5 +1,6 @@
 ﻿using BooksyClone.Contract.Availability;
 using BooksyClone.Domain.Availability.Storage;
+using BooksyClone.Domain.Availability.UpdatingResourceLockingPolicy;
 using BooksyClone.Domain.Schedules;
 using BooksyClone.Infrastructure.TimeManagement;
 using Dapper;
@@ -8,12 +9,14 @@ namespace BooksyClone.Domain.Availability.LockingTimeslotOnResource;
 
 internal class GenerateLock
 {
-    private readonly DbConnectionFactory _dbConnectionFactory;
+	private readonly GetResourcePolicies _getResourcePolicies;
+	private readonly DbConnectionFactory _dbConnectionFactory;
     private readonly ITimeService _timeService;
 
     public GenerateLock(DbConnectionFactory dbConnectionFactory, ITimeService timeService)
     {
-        _dbConnectionFactory = dbConnectionFactory;
+		_getResourcePolicies = new GetResourcePolicies(dbConnectionFactory);
+		_dbConnectionFactory = dbConnectionFactory;
         _timeService = timeService;
     }
 
