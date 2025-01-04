@@ -64,7 +64,7 @@ public class SchedulesFacade
         return new PagedListResponse<EmployeScheduleDto>(employeesSchedules, paging.Page, paging.PageSize, result.TotalCount);
     }
 
-    public async Task<FetchScheduleDefinitionDetailsResponse> FetchEmployeeScheduleDetailsAsync(Guid businessUnitId, Guid employeeId, YearMonth yearMonth, CancellationToken ct)
+    public async Task<FetchScheduleDefinitionDetailsResponse?> FetchEmployeeScheduleDetailsAsync(Guid businessUnitId, Guid employeeId, YearMonth yearMonth, CancellationToken ct)
     {
         var schedule = await _scheduleRepository.FindAsync(businessUnitId, employeeId, yearMonth, ct);
         if (schedule == null)

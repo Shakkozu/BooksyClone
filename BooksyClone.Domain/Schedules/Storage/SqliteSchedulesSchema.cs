@@ -17,7 +17,7 @@ internal static class SqliteSchedulesSchema
             builder.Property(x => x.Definition)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<IEnumerable<MonthlyScheduleDefinitionDto>>(v))
+                    v => JsonConvert.DeserializeObject<IEnumerable<MonthlyScheduleDefinitionDto>>(v)!)
                 .HasColumnType("TEXT");
 
             builder.Property(x => x.Year).IsRequired();
@@ -44,7 +44,7 @@ internal static class SqliteSchedulesSchema
             builder.Property(x => x.EmployeesIds).HasConversion
             (
                 v => JsonConvert.SerializeObject(v),
-                v => JsonConvert.DeserializeObject<IEnumerable<Guid>>(v));
+                v => JsonConvert.DeserializeObject<IEnumerable<Guid>>(v)!);
         });
     }
 

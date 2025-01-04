@@ -159,7 +159,7 @@ public class OnboardingProcessUserAcceptanceTests
         var result = httpClient.GetAsync($"/api/v1/business/{_businessDraftId}").GetAwaiter().GetResult();
         result.EnsureSuccessStatusCode();
         var retrievedBusinessCreationDraftRequest = result.Content.ReadFromJsonAsync<FetchBusinessDraftStateResponse>().GetAwaiter().GetResult();
-        BusinessDraftComparer.AreEqual(retrievedBusinessCreationDraftRequest, _request);
+        BusinessDraftComparer.AreEqual(retrievedBusinessCreationDraftRequest!, _request);
     }
 
     private void AndInformationThatBusinessDraftWasRegisteredIsPublishedOnMessageBus()

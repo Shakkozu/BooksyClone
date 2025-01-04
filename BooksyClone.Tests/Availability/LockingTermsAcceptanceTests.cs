@@ -54,7 +54,7 @@ public class LockingTermsAcceptanceTests
 			Start = currentTime,
 			End = currentTime,
 			Policies = [
-				new DayOfWeekTimeRestrictionsPolicyDto { DaysDefinition = (updateRequest.Policies[0] as DayOfWeekTimeRestrictionsPolicyDto).DaysDefinition },
+				new DayOfWeekTimeRestrictionsPolicyDto { DaysDefinition = ((DayOfWeekTimeRestrictionsPolicyDto)updateRequest.Policies[0]).DaysDefinition },
 				new TestPolicyDto { TestProperty = "dupa"},
 			]
 		};

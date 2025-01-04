@@ -17,13 +17,13 @@ internal static class SqliteBusinessDraftsSchema
             builder.Property(x => x.BusinessDetails)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<BusinessDetails>(v))
+                    v => JsonConvert.DeserializeObject<BusinessDetails>(v)!)
                 .HasColumnType("TEXT");  // SQLite uses TEXT for JSON
 
             builder.Property(x => x.UserDetails)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<UserDetails>(v))
+                    v => JsonConvert.DeserializeObject<UserDetails>(v)!)
                 .HasColumnType("TEXT");
 
             // Map file as BLOB

@@ -19,7 +19,6 @@ public class BooksyCloneApp : WebApplicationFactory<Program>
 {
     private IServiceScope _scope;
     private bool _reuseScope;
-    private string _token;
     private readonly Action<IServiceCollection> _customization;
     private ITimeService _timeService;
     private BooksyCloneApp(Action<IServiceCollection> customization, bool reuseScope = false)

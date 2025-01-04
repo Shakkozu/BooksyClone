@@ -10,7 +10,7 @@ public class PolicyDtoConverter : JsonConverter
 		return typeof(BaseTimeRestrictionsPolicyDto).IsAssignableFrom(objectType);
 	}
 
-	public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+	public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
 	{
 		var jsonObject = Newtonsoft.Json.Linq.JObject.Load(reader);
 		var policyType = jsonObject["PolicyType"]?.Value<string>();
@@ -26,8 +26,14 @@ public class PolicyDtoConverter : JsonConverter
 		return result;
 	}
 
-	public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+	public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
 	{
+		if(value is null)
+		{
+			writer.WriteNull();
+			return;
+		}
+
 		var jsonObject = Newtonsoft.Json.Linq.JObject.FromObject(value, serializer);
 		jsonObject.WriteTo(writer);
 	}

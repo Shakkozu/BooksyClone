@@ -140,7 +140,6 @@ public class Reservation
 public class TimeSlotOutsideBoundariesException : Exception
 {
     private TimeSlot _reservationTimeslot;
-    private string _v;
 
     public TimeSlotOutsideBoundariesException(string message) : base(message)
     {
