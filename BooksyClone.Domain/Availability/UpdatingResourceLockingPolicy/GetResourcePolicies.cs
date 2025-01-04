@@ -1,5 +1,6 @@
 ﻿using BooksyClone.Contract.Availability.UpdatingPolicies;
 using BooksyClone.Domain.Availability.Storage;
+using BooksyClone.Domain.Shared;
 using Dapper;
 using Newtonsoft.Json;
 
@@ -29,7 +30,7 @@ class GetResourcePolicies(DbConnectionFactory _dbConnectionFactory)
 
 		var definition = await connection.QuerySingleOrDefaultAsync<string>(sql, dao);
 		if (definition is null)
-			throw new InvalidOperationException("no data found");
+			return [];
 
 		var settings = new JsonSerializerSettings();
 		settings.Converters.Add(new PolicyDtoConverter());

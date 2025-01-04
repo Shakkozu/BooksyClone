@@ -1,7 +1,9 @@
 ﻿using BooksyClone.Contract.Availability;
 using BooksyClone.Contract.Availability.UpdatingPolicies;
 using BooksyClone.Domain.Availability;
+using BooksyClone.Domain.Availability.LockingTimeslotOnResource;
 using FakeItEasy;
+using FluentAssertions;
 using Npgsql;
 using System.Globalization;
 
@@ -85,9 +87,19 @@ public class LockingTermsAcceptanceTests
 		var requestFailedDueToForbiddedTime = ALockRequestForDay(DayOfWeek.Monday, new TimeSpan(7, 59, 59), new TimeSpan(8, 0, 1));
 		var requestSucceed = ALockRequestForDay(DayOfWeek.Monday, new TimeSpan(8, 0, 0), new TimeSpan(8, 30, 0));
 
-		await _facade.GenerateLockAsync(requestSucceed);
-		Assert.ThrowsAsync<PostgresException>(async () => await _facade.GenerateLockAsync(requestFailedDueToForbiddedDay));
-		Assert.ThrowsAsync<PostgresException>(async () => await _facade.GenerateLockAsync(requestFailedDueToForbiddedTime));
+
+		var correctRequest = await _facade.GenerateLockAsync(requestSucceed);
+		correctRequest.Succeeded.Should().BeTrue();
+
+		var forbiddenDayResult = await _facade.GenerateLockAsync(requestFailedDueToForbiddedDay);
+		forbiddenDayResult.Succeeded.Should().BeFalse();
+		forbiddenDayResult.Errors.Should()
+			.ContainSingle(x => x.Code == AvailabilityErrorFactory.LockingResourceFailedDueToDayOfWeekTimeRestricitonPolicy(null, null, null).Code);
+		var forbiddenTimeResult = await _facade.GenerateLockAsync(requestFailedDueToForbiddedTime);
+		forbiddenTimeResult.Succeeded.Should().BeFalse();
+		forbiddenTimeResult.Errors.Should()
+			.ContainSingle(x => x.Code == AvailabilityErrorFactory.LockingResourceFailedDueToDayOfWeekTimeRestricitonPolicy(null, null, null).Code);
+
 	}
 
 	private UpdateResourceRestrictionsPolicyRequest GetDayOfWeekTimeRestrictionsPolicyWhichAllows8To16MondayToFriday()

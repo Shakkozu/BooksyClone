@@ -1,4 +1,5 @@
-﻿using BooksyClone.Infrastructure.TimeManagement;
+﻿using BooksyClone.Domain.Availability.LockingTimeslotOnResource;
+using BooksyClone.Infrastructure.TimeManagement;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

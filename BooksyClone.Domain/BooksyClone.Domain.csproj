@@ -6,11 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="BusinessOnboarding\AskingUserForAdditionalInformations\" />
-    <Folder Include="BusinessOnboarding\ActivatingUserAccount\" />
-    <Folder Include="BusinessOnboarding\ProvidingAdditionalInformationsToApplication\" />
-  </ItemGroup>
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />

@@ -28,7 +28,6 @@ internal class AvailabilityBuilder
             new GenerateLock(_dbConnectionFactory, _timeService),
 			new UpdateResourcePolicy(_dbConnectionFactory, _timeService),
 			new GetResourcePolicies(_dbConnectionFactory)
-
 			);
     }
 

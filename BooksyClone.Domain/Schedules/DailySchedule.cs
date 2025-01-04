@@ -103,8 +103,6 @@ public class TimeSlot
     public bool IsFullyWithin(TimeSlot another)
     {
         return From >= another.From && To <= another.To;
-
-
     }
 
     public bool OverlapsWith(TimeSlot another)

@@ -1,5 +1,6 @@
 ﻿using BooksyClone.Contract.Availability.UpdatingPolicies;
 using BooksyClone.Domain.Availability.Storage;
+using BooksyClone.Domain.Shared;
 using BooksyClone.Infrastructure.TimeManagement;
 using Dapper;
 using Newtonsoft.Json;
