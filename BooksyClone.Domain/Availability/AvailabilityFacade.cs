@@ -1,11 +1,8 @@
-﻿using Azure.Core;
-using BooksyClone.Contract.Availability;
+﻿using BooksyClone.Contract.Availability;
 using BooksyClone.Contract.Availability.UpdatingPolicies;
 using BooksyClone.Domain.Availability.CreatingNewResource;
 using BooksyClone.Domain.Availability.LockingTimeslotOnResource;
 using BooksyClone.Domain.Availability.UpdatingResourceLockingPolicy;
-using BooksyClone.Domain.Schedules;
-using Newtonsoft.Json;
 
 namespace BooksyClone.Domain.Availability;
 public class AvailabilityFacade

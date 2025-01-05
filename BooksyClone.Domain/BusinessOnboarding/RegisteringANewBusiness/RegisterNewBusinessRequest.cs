@@ -22,7 +22,7 @@ public class RegisterNewBusinessRequest
     public IFormFile BusinessProofDocument { get; set; }  
     public IFormFile UserIdentityDocument { get; set; }  
 
-    
+
     public bool LegalConsent { get; set; }  
     public required string LegalConsentContent { get; set; }
 
