@@ -25,4 +25,9 @@
     <PackageReference Include="SQLite" Version="3.13.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BooksyClone.Availability.Migrations\BooksyClone.Availability.Migrations.csproj" />
+    <ProjectReference Include="..\BooksyClone.Search.Migrations\BooksyClone.Search.Migrations.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -35,8 +35,7 @@ public class Program
         builder.Services.InstallSchedulesModule(config);
         builder.Services.InstallAvailabilityModule(config);
         builder.Services.AddAntiforgery();
-        builder.Services.ConfigureFluentMigrator(connectionString!);
-        builder.Host.UseSerilog(Log.Logger);
+		builder.Host.UseSerilog(Log.Logger);
 
         var app = builder.Build();
 
@@ -51,7 +50,7 @@ public class Program
         {
             var context = serviceScope.ServiceProvider.GetRequiredService<SqliteDbContext>();
             context.MigrateAsync().GetAwaiter().GetResult();
-            serviceScope.RunFluentMigrator();
+			MigrationsRunner.RunMigrations(connectionString);
         }
 
         app.InstallOnbardingModuleEndpoints();
