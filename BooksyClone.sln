@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BooksyClone.Availability.Mi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BooksyClone.Search.Migrations", "BooksyClone.Search.Migrations\BooksyClone.Search.Migrations.csproj", "{58FAB4EA-593F-49ED-B435-12DC3AC6B8F8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BooksyClone.Auth.Migrations", "BooksyClone.Auth.Migrations\BooksyClone.Auth.Migrations.csproj", "{F93A4072-648C-48E3-A4B0-A40B90E5311F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +60,10 @@ Global
 		{58FAB4EA-593F-49ED-B435-12DC3AC6B8F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58FAB4EA-593F-49ED-B435-12DC3AC6B8F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58FAB4EA-593F-49ED-B435-12DC3AC6B8F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F93A4072-648C-48E3-A4B0-A40B90E5311F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F93A4072-648C-48E3-A4B0-A40B90E5311F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F93A4072-648C-48E3-A4B0-A40B90E5311F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F93A4072-648C-48E3-A4B0-A40B90E5311F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -65,6 +71,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{9EDC5233-38C2-4864-8F8D-5D128F2228D2} = {9E0E8640-A14B-47F2-B507-9239BB7E5CFB}
 		{58FAB4EA-593F-49ED-B435-12DC3AC6B8F8} = {9E0E8640-A14B-47F2-B507-9239BB7E5CFB}
+		{F93A4072-648C-48E3-A4B0-A40B90E5311F} = {9E0E8640-A14B-47F2-B507-9239BB7E5CFB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C8544875-626D-42B6-BC16-E9CF218D1C70}

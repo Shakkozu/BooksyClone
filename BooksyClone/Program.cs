@@ -5,6 +5,7 @@ using BooksyClone.Domain.Storage;
 using BooksyClone.Domain.Schedules;
 using BooksyClone.Infrastructure.Migrations;
 using BooksyClone.Domain.Availability;
+using BooksyClone.Domain.Auth;
 
 namespace BooksyClone;
 
@@ -34,6 +35,7 @@ public class Program
         builder.Services.InstallOnboardingModule(config);
         builder.Services.InstallSchedulesModule(config);
         builder.Services.InstallAvailabilityModule(config);
+        builder.Services.InstallAuthModule(config);
         builder.Services.AddAntiforgery();
 		builder.Host.UseSerilog(Log.Logger);
 
@@ -56,9 +58,11 @@ public class Program
         app.InstallOnbardingModuleEndpoints();
         app.InstallSchedulesModuleEndpoints();
         app.InstallAvailabilityModuleEndpoints();
+		app.MapAuthenticationModuleEndpoints();
 
-        app.UseHttpsRedirection();
+		app.UseHttpsRedirection();
 
+		app.UseAuthentication();
         app.UseAuthorization();
         app.UseAntiforgery();
 

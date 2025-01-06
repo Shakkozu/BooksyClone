@@ -1,4 +1,5 @@
-﻿using BooksyClone.Infrastructure.Migrations.Availability;
+﻿using BooksyClone.Auth.Migrations;
+using BooksyClone.Infrastructure.Migrations.Availability;
 using BooksyClone.Infrastructure.Migrations.Search;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.VersionTableInfo;
@@ -6,43 +7,31 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BooksyClone.Infrastructure.Migrations;
 public static class MigrationsRunner
-{	public static void RunMigrations(string connectionString)
+{
+	public static void RunMigrations(string connectionString)
 	{
-		// Configure migrations for Availability module
-		var availabilityServices = new ServiceCollection()
+		RunModuleMigrations<AddResourcesTable>(connectionString);
+		RunModuleMigrations<_0001_AddServiceToTimeRequiredTable>(connectionString, "search");
+		RunModuleMigrations<Migration0001_CreateUserContext>(connectionString, "auth");
+	}
+
+	private static void RunModuleMigrations<TMigration>(string connectionString, string schemaName = "public")
+	{
+		var versionTableMetadata = string.IsNullOrEmpty(schemaName) ? new DefaultVersionTableMetaData() : new DefaultVersionTableMetaData(schemaName);
+		var services = new ServiceCollection()
 			.AddFluentMigratorCore()
 			.ConfigureRunner(rb => rb
 				.AddPostgres()
 				.WithGlobalConnectionString(connectionString)
-				.ScanIn(typeof(AddResourcesTable).Assembly).For.Migrations()
-				)
-			.AddLogging(lb => lb.AddFluentMigratorConsole());
+				.ScanIn(typeof(TMigration).Assembly).For.Migrations()
+				.WithVersionTable(versionTableMetadata))
+			.AddLogging(lb => lb.AddFluentMigratorConsole())
+			.BuildServiceProvider();
 
-		// Configure migrations for Search module
-		var searchServices = new ServiceCollection()
-			.AddFluentMigratorCore()
-			.ConfigureRunner(rb => rb
-				.AddPostgres()
-				.WithGlobalConnectionString(connectionString)
-				.ScanIn(typeof(_0001_AddServiceToTimeRequiredTable).Assembly).For.Migrations()
-				.WithVersionTable(new DefaultVersionTableMetaData("search")))
-			.AddLogging(lb => lb.AddFluentMigratorConsole());
-
-		// Build service providers for each module
-		var availabilityServiceProvider = availabilityServices.BuildServiceProvider();
-		var searchServiceProvider = searchServices.BuildServiceProvider();
-
-		// Run migrations for each module
-		using (var availabilityScope = availabilityServiceProvider.CreateScope())
+		using (var scope = services.CreateScope())
 		{
-			var availabilityRunner = availabilityScope.ServiceProvider.GetRequiredService<IMigrationRunner>();
-			availabilityRunner.MigrateUp();
-		}
-
-		using (var searchScope = searchServiceProvider.CreateScope())
-		{
-			var searchRunner = searchScope.ServiceProvider.GetRequiredService<IMigrationRunner>();
-			searchRunner.MigrateUp();
+			var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+			runner.MigrateUp();
 		}
 	}
 }

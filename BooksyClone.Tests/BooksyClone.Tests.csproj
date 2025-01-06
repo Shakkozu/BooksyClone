@@ -10,6 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="BusinessOnboarding\LegalConsents\**" />
+    <EmbeddedResource Remove="BusinessOnboarding\LegalConsents\**" />
+    <None Remove="BusinessOnboarding\LegalConsents\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Bogus" Version="35.6.1" />
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <PackageReference Include="FakeItEasy" Version="8.3.0" />
@@ -34,7 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="BusinessOnboarding\LegalConsents\" />
+    <Folder Include="Search\" />
   </ItemGroup>
 
 </Project>
