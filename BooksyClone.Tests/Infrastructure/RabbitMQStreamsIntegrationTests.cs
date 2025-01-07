@@ -8,50 +8,50 @@ namespace BooksyClone.Tests.Infrastructure;
 [TestFixture]
 internal class RabbitMQStreamsIntegrationTests
 {
-    private RabbitMQStreamProducerConfiguration _testProducerConfiguration;
-    private RabbitMQStreamConsumerConfiguration _testConsumerConfiguration;
+	private RabbitMQStreamProducerConfiguration _testProducerConfiguration;
+	private RabbitMQStreamConsumerConfiguration _testConsumerConfiguration;
 
-    [SetUp]
-    public void Setup()
-    {
-        var streamName = Guid.NewGuid().ToString();
-        _testProducerConfiguration = new RabbitMQStreamProducerConfiguration(
-        streamName,
-        "127.0.0.1",
-        5552);
-        _testConsumerConfiguration = new RabbitMQStreamConsumerConfiguration(
-            streamName,
-            "127.0.0.1",
-            5552,
-            "test-consumer",
-            new RetryPolicy(3, retryAttempts => TimeSpan.FromMilliseconds(Math.Pow(2, retryAttempts))));
-    }
+	[SetUp]
+	public void Setup()
+	{
+		var streamName = Guid.NewGuid().ToString();
+		_testProducerConfiguration = new RabbitMQStreamProducerConfiguration(
+		streamName,
+		"127.0.0.1",
+		5552);
+		_testConsumerConfiguration = new RabbitMQStreamConsumerConfiguration(
+			streamName,
+			"127.0.0.1",
+			5552,
+			"test-consumer",
+			new RetryPolicy(3, retryAttempts => TimeSpan.FromMilliseconds(Math.Pow(2, retryAttempts))));
+	}
 
-    [Test]
-    public async Task ConsumerShouldConsumeReceivedMessages()
-    {
-        var testProducer = new TestProducer(_testProducerConfiguration);
-        var fakeDependency = A.Fake<ITestService>();
-        var testConsumer = new TestConsumer(fakeDependency, _testConsumerConfiguration);
-        var app = BooksyCloneApp.CreateInstance(services =>
-        {
-            services.AddSingleton(testProducer);
-            services.AddHostedService(sp =>
-            {
-                return testConsumer;
-            });
-        });
-        var payload = new TestRabbitMqStreamsMessage("Dupa", DateTime.Now);
-        await testProducer.Send(payload);
+	[Test]
+	public async Task ConsumerShouldConsumeReceivedMessages()
+	{
+		var testProducer = new TestProducer(_testProducerConfiguration);
+		var fakeDependency = A.Fake<ITestService>();
+		var testConsumer = new TestConsumer(fakeDependency, _testConsumerConfiguration);
+		var app = BooksyCloneApp.CreateInstance(services =>
+		{
+			services.AddSingleton(testProducer);
+			services.AddHostedService(sp =>
+			{
+				return testConsumer;
+			});
+		});
+		var payload = new TestRabbitMqStreamsMessage("Dupa", DateTime.Now);
+		await testProducer.Send(payload);
 
-        Task.Delay(50).Wait();
+		Task.Delay(50).Wait();
 
-        A.CallTo(() => fakeDependency.Call(A<TestRabbitMqStreamsMessage>.That.IsEqualTo(payload)))
-            .MustHaveHappenedOnceExactly();
-    }
+		A.CallTo(() => fakeDependency.Call(A<TestRabbitMqStreamsMessage>.That.IsEqualTo(payload)))
+			.MustHaveHappenedOnceExactly();
+	}
 
-    [Test]
-    public async Task ConsumerShouldRetrieveMessagesWhichWereProducerWhileConsumerWasOffline()
+	[Test]
+	public async Task ConsumerShouldRetrieveMessagesWhichWereProducerWhileConsumerWasOffline()
 	{
 		var testProducer = new TestProducer(_testProducerConfiguration);
 		var fakeDependency = A.Fake<ITestService>();
@@ -78,11 +78,45 @@ internal class RabbitMQStreamsIntegrationTests
 	}
 
 	[Test]
-    public async Task ConsumerShouldRetryHandlingMessagesWhichCausesExceptions()
-    {
-        var testProducer = new TestProducer(_testProducerConfiguration);
-        var fakeDependency = A.Fake<ITestService>();
-        var testConsumer = new TestConsumerWhichRequiresMultipleTimestoProcessMessage(fakeDependency, _testConsumerConfiguration);
+	public async Task MultipleConsumersShouldConsumeAnMessageProduced()
+	{
+		var testProducer = new TestProducer(_testProducerConfiguration);
+		var fakeDependency = A.Fake<ITestService>();
+		var anotherFakeDependency = A.Fake<ITestService>();
+		var baseConfig = _testConsumerConfiguration;
+		var consumer1 = new TestConsumer(fakeDependency, CopyConsumerConfigWithSpecifiedConsumerName(baseConfig, "consumer1"));
+		var consumer2 = new AnotherTestConsumer(anotherFakeDependency, CopyConsumerConfigWithSpecifiedConsumerName(baseConfig, "consumer2"));
+		BooksyCloneApp.CreateInstance(services =>
+		{
+			services.AddSingleton(testProducer);
+			services.AddHostedService(sp =>
+			{
+				return consumer2;
+			});
+			services.AddHostedService(sp =>
+			{
+				return consumer1;
+			});
+		});
+		var payload = new TestRabbitMqStreamsMessage("Dupa", DateTime.Now);
+		await testProducer.Send(payload);
+
+		// Wait for the consumers to process the message
+		await Task.Delay(100);
+
+		// Assert that both consumers have consumed the message
+		A.CallTo(() => fakeDependency.Call(A<TestRabbitMqStreamsMessage>.That.IsEqualTo(payload)))
+			.MustHaveHappened();
+		A.CallTo(() => anotherFakeDependency.Call(A<TestRabbitMqStreamsMessage>.That.IsEqualTo(payload)))
+			.MustHaveHappened();
+	}
+
+	[Test]
+	public async Task ConsumerShouldRetryHandlingMessagesWhichCausesExceptions()
+	{
+		var testProducer = new TestProducer(_testProducerConfiguration);
+		var fakeDependency = A.Fake<ITestService>();
+		var testConsumer = new TestConsumerWhichRequiresMultipleTimestoProcessMessage(fakeDependency, _testConsumerConfiguration);
 		BooksyCloneApp.CreateInstance(services =>
 		{
 			services.AddSingleton(testProducer);
@@ -92,13 +126,23 @@ internal class RabbitMQStreamsIntegrationTests
 			});
 		});
 		var payload = new TestRabbitMqStreamsMessage("Dupa", DateTime.Now);
-        await testProducer.Send(payload);
+		await testProducer.Send(payload);
 
-        Task.Delay(50).Wait();
+		Task.Delay(50).Wait();
 
-        A.CallTo(() => fakeDependency.Call(A<TestRabbitMqStreamsMessage>.That.IsEqualTo(payload)))
-            .MustHaveHappenedOnceExactly();
-    }
+		A.CallTo(() => fakeDependency.Call(A<TestRabbitMqStreamsMessage>.That.IsEqualTo(payload)))
+			.MustHaveHappenedOnceExactly();
+	}
+
+	private RabbitMQStreamConsumerConfiguration CopyConsumerConfigWithSpecifiedConsumerName(RabbitMQStreamConsumerConfiguration @base, string consumerName)
+	{
+		return new RabbitMQStreamConsumerConfiguration(
+			@base.StreamName,
+			@base.RabbitMQAddress,
+			@base.RabbitMQPort,
+			consumerName,
+			@base.RetryPolicy);
+	}
 }
 public record TestRabbitMqStreamsMessage(string Message, DateTime Timestamp);
 
@@ -108,23 +152,23 @@ internal class HostedServiceTest : IHostedService
 	private readonly TestConsumer _testConsumer;
 
 	public HostedServiceTest(TestConsumer testConsumer)
-    {
+	{
 		_testConsumer = testConsumer;
 	}
-    internal async Task SwitchToConsumerMode(CancellationToken ct)
+	internal async Task SwitchToConsumerMode(CancellationToken ct)
 	{
 		await _testConsumer.StartAsync(ct);
 	}
-	
+
 	internal async Task StopConsumerMode(CancellationToken ct)
 	{
 		await _testConsumer.StopAsync(ct);
 	}
 	public Task StartAsync(CancellationToken cancellationToken)
 	{
-        Console.WriteLine("Start");
+		Console.WriteLine("Start");
 		return Task.CompletedTask;
-    }
+	}
 
 	public Task StopAsync(CancellationToken cancellationToken)
 	{
@@ -134,47 +178,64 @@ internal class HostedServiceTest : IHostedService
 }
 internal class TestConsumer : RabbitMQStreamsConsumer<TestRabbitMqStreamsMessage>
 {
-    private readonly ITestService _testService;
-    private RabbitMQStreamConsumerConfiguration _config;
+	private readonly ITestService _testService;
+	private RabbitMQStreamConsumerConfiguration _config;
 
-    public TestConsumer(ITestService testService, RabbitMQStreamConsumerConfiguration config) : base(config)
-    {
-        _testService = testService;
-        _config = config;
-    }
+	public TestConsumer(ITestService testService, RabbitMQStreamConsumerConfiguration config) : base(config)
+	{
+		_testService = testService;
+		_config = config;
+	}
 
-    protected override Task HandleAsync(TestRabbitMqStreamsMessage message)
-    {
-        _testService.Call(message);
-        return Task.CompletedTask;
-    }
+	protected override Task HandleAsync(TestRabbitMqStreamsMessage message)
+	{
+		_testService.Call(message);
+		return Task.CompletedTask;
+	}
+}
+internal class AnotherTestConsumer : RabbitMQStreamsConsumer<TestRabbitMqStreamsMessage>
+{
+	private readonly ITestService _testService;
+	private RabbitMQStreamConsumerConfiguration _config;
+
+	public AnotherTestConsumer(ITestService testService, RabbitMQStreamConsumerConfiguration config) : base(config)
+	{
+		_testService = testService;
+		_config = config;
+	}
+
+	protected override Task HandleAsync(TestRabbitMqStreamsMessage message)
+	{
+		_testService.Call(message);
+		return Task.CompletedTask;
+	}
 }
 
 internal class TestConsumerWhichRequiresMultipleTimestoProcessMessage : RabbitMQStreamsConsumer<TestRabbitMqStreamsMessage>
 {
-    private readonly ITestService _testService;
-    private RabbitMQStreamConsumerConfiguration _config;
-    private int _counter = 0;
+	private readonly ITestService _testService;
+	private RabbitMQStreamConsumerConfiguration _config;
+	private int _counter = 0;
 
-    public TestConsumerWhichRequiresMultipleTimestoProcessMessage(ITestService testService, RabbitMQStreamConsumerConfiguration config) : base(config)
-    {
-        _testService = testService;
-        _config = config;
-    }
+	public TestConsumerWhichRequiresMultipleTimestoProcessMessage(ITestService testService, RabbitMQStreamConsumerConfiguration config) : base(config)
+	{
+		_testService = testService;
+		_config = config;
+	}
 
-    protected override Task HandleAsync(TestRabbitMqStreamsMessage message)
-    {
-        _counter++;
-        if (_counter < 3)
-            throw new InvalidOperationException("retry tests");
+	protected override Task HandleAsync(TestRabbitMqStreamsMessage message)
+	{
+		_counter++;
+		if (_counter < 3)
+			throw new InvalidOperationException("retry tests");
 
-        _testService.Call(message);
-        return Task.CompletedTask;
-    }
+		_testService.Call(message);
+		return Task.CompletedTask;
+	}
 }
 
 public interface ITestService
 {
-    void Call(TestRabbitMqStreamsMessage message);
+	void Call(TestRabbitMqStreamsMessage message);
 }
 
