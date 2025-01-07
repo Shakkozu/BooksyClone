@@ -2,6 +2,7 @@
 using BooksyClone.Infrastructure.RabbitMQStreams.Producing;
 using FakeItEasy;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace BooksyClone.Tests.Infrastructure;
 [TestFixture]
@@ -50,20 +51,47 @@ internal class RabbitMQStreamsIntegrationTests
     }
 
     [Test]
+    public async Task ConsumerShouldRetrieveMessagesWhichWereProducerWhileConsumerWasOffline()
+	{
+		var testProducer = new TestProducer(_testProducerConfiguration);
+		var fakeDependency = A.Fake<ITestService>();
+		var hostedServiceTest = new HostedServiceTest(new TestConsumer(fakeDependency, _testConsumerConfiguration));
+		BooksyCloneApp.CreateInstance(services =>
+		{
+			services.AddSingleton(testProducer);
+			services.AddHostedService(sp =>
+			{
+				return hostedServiceTest;
+			});
+		});
+		var payload = new TestRabbitMqStreamsMessage("Dupa", DateTime.Now);
+		await testProducer.Send(payload);
+
+		Task.Delay(50).Wait();
+		A.CallTo(() => fakeDependency.Call(A<TestRabbitMqStreamsMessage>.That.IsEqualTo(payload)))
+			.MustNotHaveHappened();
+
+		await hostedServiceTest.SwitchToConsumerMode(CancellationToken.None);
+		Task.Delay(50).Wait();
+		A.CallTo(() => fakeDependency.Call(A<TestRabbitMqStreamsMessage>.That.IsEqualTo(payload)))
+			.MustHaveHappenedOnceExactly();
+	}
+
+	[Test]
     public async Task ConsumerShouldRetryHandlingMessagesWhichCausesExceptions()
     {
         var testProducer = new TestProducer(_testProducerConfiguration);
         var fakeDependency = A.Fake<ITestService>();
         var testConsumer = new TestConsumerWhichRequiresMultipleTimestoProcessMessage(fakeDependency, _testConsumerConfiguration);
-        var app = BooksyCloneApp.CreateInstance(services =>
-        {
-            services.AddSingleton(testProducer);
-            services.AddHostedService(sp =>
-            {
-                return testConsumer;
-            });
-        });
-        var payload = new TestRabbitMqStreamsMessage("Dupa", DateTime.Now);
+		BooksyCloneApp.CreateInstance(services =>
+		{
+			services.AddSingleton(testProducer);
+			services.AddHostedService(sp =>
+			{
+				return testConsumer;
+			});
+		});
+		var payload = new TestRabbitMqStreamsMessage("Dupa", DateTime.Now);
         await testProducer.Send(payload);
 
         Task.Delay(50).Wait();
@@ -71,10 +99,39 @@ internal class RabbitMQStreamsIntegrationTests
         A.CallTo(() => fakeDependency.Call(A<TestRabbitMqStreamsMessage>.That.IsEqualTo(payload)))
             .MustHaveHappenedOnceExactly();
     }
-
 }
 public record TestRabbitMqStreamsMessage(string Message, DateTime Timestamp);
 
+
+internal class HostedServiceTest : IHostedService
+{
+	private readonly TestConsumer _testConsumer;
+
+	public HostedServiceTest(TestConsumer testConsumer)
+    {
+		_testConsumer = testConsumer;
+	}
+    internal async Task SwitchToConsumerMode(CancellationToken ct)
+	{
+		await _testConsumer.StartAsync(ct);
+	}
+	
+	internal async Task StopConsumerMode(CancellationToken ct)
+	{
+		await _testConsumer.StopAsync(ct);
+	}
+	public Task StartAsync(CancellationToken cancellationToken)
+	{
+        Console.WriteLine("Start");
+		return Task.CompletedTask;
+    }
+
+	public Task StopAsync(CancellationToken cancellationToken)
+	{
+		Console.WriteLine("Stop");
+		return Task.CompletedTask;
+	}
+}
 internal class TestConsumer : RabbitMQStreamsConsumer<TestRabbitMqStreamsMessage>
 {
     private readonly ITestService _testService;
