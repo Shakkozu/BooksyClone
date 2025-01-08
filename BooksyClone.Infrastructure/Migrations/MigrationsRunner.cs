@@ -1,6 +1,8 @@
 ﻿using BooksyClone.Auth.Migrations;
+using BooksyClone.BusinessManagement.Migrations;
 using BooksyClone.Infrastructure.Migrations.Availability;
 using BooksyClone.Infrastructure.Migrations.Search;
+using BooksyClone.Schedules.Migrations;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.VersionTableInfo;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +15,8 @@ public static class MigrationsRunner
 		RunModuleMigrations<AddResourcesTable>(connectionString);
 		RunModuleMigrations<_0001_AddServiceToTimeRequiredTable>(connectionString, "search");
 		RunModuleMigrations<Migration0001_CreateUserContext>(connectionString, "auth");
+		RunModuleMigrations<CreateBusinessDraftsTable>(connectionString, BusinessDraftsConfiguration.SchemaName);
+		RunModuleMigrations<CreateSchedulesTables>(connectionString, SchedulesMigrationsConfiguration.SchemaName);
 	}
 
 	private static void RunModuleMigrations<TMigration>(string connectionString, string schemaName = "public")

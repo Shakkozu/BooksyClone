@@ -20,11 +20,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Migrations", "Migrations", "{9E0E8640-A14B-47F2-B507-9239BB7E5CFB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BooksyClone.Availability.Migrations", "BooksyClone.Availability.Migrations\BooksyClone.Availability.Migrations.csproj", "{9EDC5233-38C2-4864-8F8D-5D128F2228D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Availability.Migrations", "BooksyClone.Availability.Migrations\BooksyClone.Availability.Migrations.csproj", "{9EDC5233-38C2-4864-8F8D-5D128F2228D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BooksyClone.Search.Migrations", "BooksyClone.Search.Migrations\BooksyClone.Search.Migrations.csproj", "{58FAB4EA-593F-49ED-B435-12DC3AC6B8F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Search.Migrations", "BooksyClone.Search.Migrations\BooksyClone.Search.Migrations.csproj", "{58FAB4EA-593F-49ED-B435-12DC3AC6B8F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BooksyClone.Auth.Migrations", "BooksyClone.Auth.Migrations\BooksyClone.Auth.Migrations.csproj", "{F93A4072-648C-48E3-A4B0-A40B90E5311F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Auth.Migrations", "BooksyClone.Auth.Migrations\BooksyClone.Auth.Migrations.csproj", "{F93A4072-648C-48E3-A4B0-A40B90E5311F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BooksyClone.BusinessManagement.Migrations", "BooksyClone.BusinessManagement.Migrations\BooksyClone.BusinessManagement.Migrations.csproj", "{3D13E380-E7FD-44AB-8A83-6A16956A9F78}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BooksyClone.Schedules.Migrations", "BooksyClone.Schedules.Migrations\BooksyClone.Schedules.Migrations.csproj", "{D5B9D63F-7D5E-4539-B8FC-12F9F85D9D0E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -64,6 +68,14 @@ Global
 		{F93A4072-648C-48E3-A4B0-A40B90E5311F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F93A4072-648C-48E3-A4B0-A40B90E5311F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F93A4072-648C-48E3-A4B0-A40B90E5311F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D13E380-E7FD-44AB-8A83-6A16956A9F78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D13E380-E7FD-44AB-8A83-6A16956A9F78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D13E380-E7FD-44AB-8A83-6A16956A9F78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D13E380-E7FD-44AB-8A83-6A16956A9F78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5B9D63F-7D5E-4539-B8FC-12F9F85D9D0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5B9D63F-7D5E-4539-B8FC-12F9F85D9D0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5B9D63F-7D5E-4539-B8FC-12F9F85D9D0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5B9D63F-7D5E-4539-B8FC-12F9F85D9D0E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -72,6 +84,8 @@ Global
 		{9EDC5233-38C2-4864-8F8D-5D128F2228D2} = {9E0E8640-A14B-47F2-B507-9239BB7E5CFB}
 		{58FAB4EA-593F-49ED-B435-12DC3AC6B8F8} = {9E0E8640-A14B-47F2-B507-9239BB7E5CFB}
 		{F93A4072-648C-48E3-A4B0-A40B90E5311F} = {9E0E8640-A14B-47F2-B507-9239BB7E5CFB}
+		{3D13E380-E7FD-44AB-8A83-6A16956A9F78} = {9E0E8640-A14B-47F2-B507-9239BB7E5CFB}
+		{D5B9D63F-7D5E-4539-B8FC-12F9F85D9D0E} = {9E0E8640-A14B-47F2-B507-9239BB7E5CFB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C8544875-626D-42B6-BC16-E9CF218D1C70}
