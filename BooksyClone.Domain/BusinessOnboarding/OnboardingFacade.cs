@@ -4,16 +4,15 @@ using BooksyClone.Domain.Storage;
 using Microsoft.EntityFrameworkCore;
 using BooksyClone.Domain.BusinessOnboarding.FetchingBusinessCreationApplication;
 using BooksyClone.Contract.BusinessOnboarding;
-using BooksyClone.Infrastructure.RabbitMQStreams;
 
 namespace BooksyClone.Domain.BusinessOnboarding;
 
 internal class OnboardingFacade
 {
-    private readonly SqliteDbContext _dbContext;
+    private readonly PostgresDbContext _dbContext;
     private readonly IOnboardingEventsPublisher _onboardingEventsPublisher;
 
-    public OnboardingFacade(SqliteDbContext dbContext,
+    public OnboardingFacade(PostgresDbContext dbContext,
         IOnboardingEventsPublisher onboardingEventsPublisher)
     {
         _dbContext = dbContext;

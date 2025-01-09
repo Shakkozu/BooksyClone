@@ -30,7 +30,7 @@ public static class SchedulesModule
                 sp.GetRequiredService<SchedulesFacade>());
         });
         serviceProvider.AddTransient<IScheduleDefinitionRepository, EntityFrameworkScheduleDefinitionRepository>();
-        serviceProvider.AddTransient<ISchedulesBusinessEmployesRepository, EntityFrameworkSqliteSchedulesBusinessEmployeesRepository>();
+        serviceProvider.AddTransient<ISchedulesBusinessEmployesRepository, EntityFrameworkSchedulesBusinessEmployeesRepository>();
 
         serviceProvider.AddSingleton<ISchedulesEventsPublisher, SchedulesPublisher>(_ => new SchedulesPublisher(GetSchedulesProducerConfiguration(configuration)));
 

@@ -13,17 +13,17 @@ internal interface ISchedulesBusinessEmployesRepository
     Task RegisterNewBusinessUnit(Guid businessUnitId, IEnumerable<Guid> employees, CancellationToken ct);
 }
 
-internal class EntityFrameworkSqliteSchedulesBusinessEmployeesRepository : ISchedulesBusinessEmployesRepository
+internal class EntityFrameworkSchedulesBusinessEmployeesRepository : ISchedulesBusinessEmployesRepository
 {
-    private readonly SqliteDbContext _sqliteDbContext;
+    private readonly PostgresDbContext _PostgresDbContext;
 
-    public EntityFrameworkSqliteSchedulesBusinessEmployeesRepository(SqliteDbContext sqliteDbContext)
+    public EntityFrameworkSchedulesBusinessEmployeesRepository(PostgresDbContext PostgresDbContext)
     {
-        _sqliteDbContext = sqliteDbContext;
+        _PostgresDbContext = PostgresDbContext;
     }
     public async Task<IEnumerable<Guid>> GetBusniessEmployees(Guid businessUnitId, CancellationToken ct)
     {
-        return (await _sqliteDbContext.ScheduleBusiness
+        return (await _PostgresDbContext.ScheduleBusiness
             .SingleAsync(x => x.BusinessUnitId == businessUnitId, ct)).EmployeesIds.ToList();
     }
 
@@ -33,7 +33,7 @@ internal class EntityFrameworkSqliteSchedulesBusinessEmployeesRepository : ISche
             BusinessUnitId = businessUnitId,
             EmployeesIds = employees
         };
-        _sqliteDbContext.Add(business);
-        await _sqliteDbContext.SaveChangesAsync(ct);
+        _PostgresDbContext.Add(business);
+        await _PostgresDbContext.SaveChangesAsync(ct);
     }
 }

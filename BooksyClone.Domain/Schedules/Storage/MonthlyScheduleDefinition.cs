@@ -16,7 +16,7 @@ internal class MonthlyScheduleDefinition : BaseEntity
         Status = ScheduleDefinitionStatus.Draft;
         BusinessUnitId = businessUnitId;
         EmployeeId = employeeId;
-        ModifiedAt = DateTime.Now;
+        ModifiedAt = DateTime.Now.ToUniversalTime();
         Month = yearMonth.Month;
         Year = yearMonth.Year;
     }
@@ -27,14 +27,14 @@ internal class MonthlyScheduleDefinition : BaseEntity
             throw new InvalidOperationException();
 
         Definition = schedule.ScheduleDefinition;
-        ModifiedAt = DateTime.Now;
+        ModifiedAt = DateTime.Now.ToUniversalTime();
     }
 
     internal void Publish(Guid publishedBy)
     {
         PublishedBy = publishedBy;
         Status = ScheduleDefinitionStatus.Published;
-        ModifiedAt = DateTime.Now;
+        ModifiedAt = DateTime.Now.ToUniversalTime();
     }
 
     public int Year { get; set; }

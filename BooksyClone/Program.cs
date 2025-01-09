@@ -31,7 +31,7 @@ public class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
-        builder.Services.InstallSqliteEntityFramework();
+        builder.Services.InstallPostgresEntityFramework(connectionString);
         builder.Services.InstallOnboardingModule(config);
         builder.Services.InstallSchedulesModule(config);
         builder.Services.InstallAvailabilityModule(config);
@@ -50,8 +50,6 @@ public class Program
 
         using (var serviceScope = app.Services.CreateScope())
         {
-            var context = serviceScope.ServiceProvider.GetRequiredService<SqliteDbContext>();
-            context.MigrateAsync().GetAwaiter().GetResult();
 			MigrationsRunner.RunMigrations(connectionString);
         }
 

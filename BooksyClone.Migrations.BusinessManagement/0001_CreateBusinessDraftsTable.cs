@@ -10,8 +10,6 @@ public class CreateBusinessDraftsTable : Migration
         Create.Table("business_drafts")
 			.InSchema("business_management")
             .WithColumn("id").AsInt64().PrimaryKey().Identity()
-			.WithColumn("guid").AsGuid().NotNullable()
-			.WithColumn("version").AsInt32().NotNullable()
             .WithColumn("business_details").AsCustom("JSONB").NotNullable()
             .WithColumn("user_details").AsCustom("JSONB").NotNullable()
             .WithColumn("business_proof_document_data").AsCustom("BYTEA").NotNullable()

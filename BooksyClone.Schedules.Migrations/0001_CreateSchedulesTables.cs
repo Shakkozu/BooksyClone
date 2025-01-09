@@ -12,6 +12,8 @@ public class CreateSchedulesTables : Migration
 			.WithColumn("id").AsInt64().PrimaryKey().Identity()
 			.WithColumn("definition").AsCustom("JSONB").NotNullable()
 			.WithColumn("year").AsInt32().NotNullable()
+			.WithColumn("guid").AsGuid().NotNullable()
+			.WithColumn("version").AsInt32().NotNullable()
 			.WithColumn("month").AsInt32().NotNullable()
 			.WithColumn("modified_at").AsDateTime().NotNullable()
 			.WithColumn("employee_id").AsGuid().NotNullable()
@@ -25,8 +27,10 @@ public class CreateSchedulesTables : Migration
 			.Columns("year", "month", "employee_id", "business_unit_id");
 
 		Create.Table("schedule_business_units")
-						.InSchema(SchedulesMigrationsConfiguration.SchemaName)
-						.WithColumn("id").AsInt64().PrimaryKey().Identity()
+			.InSchema(SchedulesMigrationsConfiguration.SchemaName)
+			.WithColumn("id").AsInt64().PrimaryKey().Identity()
+			.WithColumn("guid").AsGuid().NotNullable()
+			.WithColumn("version").AsInt32().NotNullable()
 			.WithColumn("business_unit_id").AsGuid().NotNullable()
 			.WithColumn("employees_ids").AsCustom("JSONB").NotNullable();
 	}

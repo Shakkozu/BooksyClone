@@ -90,7 +90,7 @@ public class OnboardingProcessUserAcceptanceTests
             BusinessEmail = _generator.Internet.Email(),
             BusinessNIP = "7755446779",
             CorrelationId = Guid.NewGuid(),
-            Timestamp = DateTime.Today.AddHours(15),
+            Timestamp = DateTime.Today.AddHours(15).ToUniversalTime(),
             UserEmail = _generator.Person.Email,
             BusinessPhoneNumber = _generator.Phone.PhoneNumber("#########"),
             UserFullName = _generator.Person.FullName,

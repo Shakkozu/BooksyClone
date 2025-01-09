@@ -14,7 +14,7 @@ public static class OnboardingModule
     public static void InstallOnboardingModule(this IServiceCollection serviceProvider, IConfiguration configuration)
     {
         serviceProvider.AddTransient<OnboardingFacade>();
-        serviceProvider.AddQueryable<BusinessDraft, SqliteDbContext>();
+        serviceProvider.AddQueryable<BusinessDraft, PostgresDbContext>();
         serviceProvider.AddSingleton<IOnboardingEventsPublisher, OnboardingRabbitStreamsEventsPublisher>(_ => new OnboardingRabbitStreamsEventsPublisher(GetProducerConfiguration(configuration)));
     }
 

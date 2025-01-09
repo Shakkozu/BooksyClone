@@ -30,6 +30,4 @@ internal class AvailabilityBuilder
 			new GetResourcePolicies(_dbConnectionFactory)
 			);
     }
-
-
 }

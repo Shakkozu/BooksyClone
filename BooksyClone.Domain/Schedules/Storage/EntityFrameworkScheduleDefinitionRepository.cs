@@ -15,24 +15,24 @@ internal interface IScheduleDefinitionRepository
 
 internal class EntityFrameworkScheduleDefinitionRepository : IScheduleDefinitionRepository
 {
-    private readonly SqliteDbContext _sqliteDbContext;
+    private readonly PostgresDbContext _PostgresDbContext;
 
-    public EntityFrameworkScheduleDefinitionRepository(SqliteDbContext sqliteDbContext)
+    public EntityFrameworkScheduleDefinitionRepository(PostgresDbContext PostgresDbContext)
     {
-        _sqliteDbContext = sqliteDbContext;
+        _PostgresDbContext = PostgresDbContext;
     }
 
 
 
     public async Task SaveAsync(MonthlyScheduleDefinition scheduleDefinition, CancellationToken ct)
     {
-        _sqliteDbContext.MonthlySchedules.Update(scheduleDefinition);
-        await _sqliteDbContext.SaveChangesAsync(ct);
+        _PostgresDbContext.MonthlySchedules.Update(scheduleDefinition);
+        await _PostgresDbContext.SaveChangesAsync(ct);
     }
 
     public async Task<MonthlyScheduleDefinition?> FindAsync(Guid businessUnitId, Guid employeeId, YearMonth yearMonth, CancellationToken ct)
     {
-        return await _sqliteDbContext.MonthlySchedules
+        return await _PostgresDbContext.MonthlySchedules
             .FirstOrDefaultAsync(x =>
                 x.BusinessUnitId == businessUnitId &&
                 x.EmployeeId == employeeId &&
@@ -41,12 +41,12 @@ internal class EntityFrameworkScheduleDefinitionRepository : IScheduleDefinition
 
     public async Task<PagedListResponse<MonthlyScheduleDefinition>> FindByCompanyIdAsync(Guid businessUnitId, Paging paging, CancellationToken ct)
     {
-        var schedules = await _sqliteDbContext.MonthlySchedules
+        var schedules = await _PostgresDbContext.MonthlySchedules
             .Where(x => x.BusinessUnitId == businessUnitId)
             .Skip((paging.Page - 1) * paging.PageSize)
             .Take(paging.PageSize)
             .ToListAsync();
-        var totalCount = await _sqliteDbContext.MonthlySchedules
+        var totalCount = await _PostgresDbContext.MonthlySchedules
             .CountAsync(x => x.BusinessUnitId == businessUnitId, ct);
         return new PagedListResponse<MonthlyScheduleDefinition>(schedules, paging.Page, paging.PageSize, totalCount);
     }

@@ -18,12 +18,12 @@ public class BaseEntity
 
 public static class EfCoreExtensions
 {
-    public static void MapBaseEntityProperties<T>(this EntityTypeBuilder<T> builder) where T : BaseEntity
-    {
-        builder.HasKey(e => e.Id);
-        builder.Property(e => e.Guid);
-        builder.Property("Version")
-            .HasDefaultValue(0)
-            .IsConcurrencyToken();
-    }
+	public static void MapBaseEntityProperties<T>(this EntityTypeBuilder<T> builder) where T : BaseEntity
+	{
+		builder.Property(x => x.Id).HasColumnName("id");
+		builder.Property(e => e.Guid).HasColumnName("guid");
+		builder.Property(e => e.Version)
+			.HasColumnName("version")
+			.IsConcurrencyToken();
+	}
 }
