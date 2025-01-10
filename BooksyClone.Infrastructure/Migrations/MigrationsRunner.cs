@@ -1,5 +1,6 @@
 ﻿using BooksyClone.Auth.Migrations;
 using BooksyClone.BusinessManagement.Migrations;
+using BooksyClone.Dictionaries.Migrations;
 using BooksyClone.Infrastructure.Migrations.Availability;
 using BooksyClone.Infrastructure.Migrations.Search;
 using BooksyClone.Schedules.Migrations;
@@ -17,6 +18,7 @@ public static class MigrationsRunner
 		RunModuleMigrations<Migration0001_CreateUserContext>(connectionString, "auth");
 		RunModuleMigrations<CreateBusinessDraftsTable>(connectionString, BusinessDraftsConfiguration.SchemaName);
 		RunModuleMigrations<CreateSchedulesTables>(connectionString, SchedulesMigrationsConfiguration.SchemaName);
+		RunModuleMigrations<CreateCategoriesAndServiceVariantsTables>(connectionString, DictionariesMigrationsConfiguration.SchemaName);
 	}
 
 	private static void RunModuleMigrations<TMigration>(string connectionString, string schemaName = "public")
