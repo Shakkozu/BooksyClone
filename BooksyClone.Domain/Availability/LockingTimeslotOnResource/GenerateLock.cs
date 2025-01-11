@@ -1,9 +1,7 @@
 ﻿using BooksyClone.Contract.Availability;
-using BooksyClone.Contract.Availability.UpdatingPolicies;
 using BooksyClone.Domain.Availability.Storage;
 using BooksyClone.Domain.Availability.UpdatingResourceLockingPolicy;
 using BooksyClone.Domain.Schedules;
-using BooksyClone.Domain.Shared;
 using BooksyClone.Infrastructure.TimeManagement;
 using Dapper;
 

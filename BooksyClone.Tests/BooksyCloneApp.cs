@@ -3,6 +3,7 @@
 
 
 using BooksyClone.Domain.Availability;
+using BooksyClone.Domain.Dictionaries;
 using BooksyClone.Domain.Schedules;
 using BooksyClone.Infrastructure.RabbitMQStreams;
 using BooksyClone.Infrastructure.TimeManagement;
@@ -74,12 +75,14 @@ public class BooksyCloneApp : WebApplicationFactory<Program>
 
     internal IEventPublisher GetEventPublisher => RequestScope().ServiceProvider.GetRequiredService<IEventPublisher>();
     internal SchedulesFacade SchedulesFacade => RequestScope().ServiceProvider.GetRequiredService<SchedulesFacade>();
+	internal DictionariesFacade DictionariesFacade => RequestScope().ServiceProvider.GetRequiredService<DictionariesFacade>();
 
     internal AvailabilityFacade AvailabilityFacade => RequestScope().ServiceProvider.GetRequiredService<AvailabilityFacade>();
     internal AvailabilityFixture AvailabilityFixture => RequestScope().ServiceProvider.GetRequiredService<AvailabilityFixture>();
     internal ITimeService ITimeService => RequestScope().ServiceProvider.GetRequiredService<ITimeService>();
 
-    public HttpClient CreateHttpClient()
+
+	public HttpClient CreateHttpClient()
     {
         return CreateClient();
     }
