@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34616.47
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone", "BooksyClone\BooksyClone.csproj", "{863C897B-86F7-463B-B8DC-849E06234929}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone", "src\BooksyClone\BooksyClone.csproj", "{863C897B-86F7-463B-B8DC-849E06234929}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Domain", "BooksyClone.Domain\BooksyClone.Domain.csproj", "{BC15301E-8E6D-4E5C-BB7D-7C889205D0C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Domain", "src\BooksyClone.Domain\BooksyClone.Domain.csproj", "{BC15301E-8E6D-4E5C-BB7D-7C889205D0C5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Tests", "BooksyClone.Tests\BooksyClone.Tests.csproj", "{08EA151F-810B-4632-8F44-60D63DE57CA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Tests", "src\BooksyClone.Tests\BooksyClone.Tests.csproj", "{08EA151F-810B-4632-8F44-60D63DE57CA7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Contract", "BooksyClone.Contract\BooksyClone.Contract.csproj", "{AFAB6F38-67BF-4EAB-A459-0A3225323D05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Contract", "src\BooksyClone.Contract\BooksyClone.Contract.csproj", "{AFAB6F38-67BF-4EAB-A459-0A3225323D05}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Infrastructure", "BooksyClone.Infrastructure\BooksyClone.Infrastructure.csproj", "{1A9B0C01-11BF-445F-B390-4C4AD1650332}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Infrastructure", "src\BooksyClone.Infrastructure\BooksyClone.Infrastructure.csproj", "{1A9B0C01-11BF-445F-B390-4C4AD1650332}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{139CA0CB-190E-419A-982F-1CAD151DD03D}"
 	ProjectSection(SolutionItems) = preProject
@@ -20,17 +20,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Migrations", "Migrations", "{9E0E8640-A14B-47F2-B507-9239BB7E5CFB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Availability.Migrations", "BooksyClone.Availability.Migrations\BooksyClone.Availability.Migrations.csproj", "{9EDC5233-38C2-4864-8F8D-5D128F2228D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Availability.Migrations", "src\migrations\BooksyClone.Availability.Migrations\BooksyClone.Availability.Migrations.csproj", "{9EDC5233-38C2-4864-8F8D-5D128F2228D2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Search.Migrations", "BooksyClone.Search.Migrations\BooksyClone.Search.Migrations.csproj", "{58FAB4EA-593F-49ED-B435-12DC3AC6B8F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Search.Migrations", "src\migrations\BooksyClone.Search.Migrations\BooksyClone.Search.Migrations.csproj", "{58FAB4EA-593F-49ED-B435-12DC3AC6B8F8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Auth.Migrations", "BooksyClone.Auth.Migrations\BooksyClone.Auth.Migrations.csproj", "{F93A4072-648C-48E3-A4B0-A40B90E5311F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Auth.Migrations", "src\migrations\BooksyClone.Auth.Migrations\BooksyClone.Auth.Migrations.csproj", "{F93A4072-648C-48E3-A4B0-A40B90E5311F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.BusinessManagement.Migrations", "BooksyClone.BusinessManagement.Migrations\BooksyClone.BusinessManagement.Migrations.csproj", "{3D13E380-E7FD-44AB-8A83-6A16956A9F78}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.BusinessManagement.Migrations", "src\migrations\BooksyClone.BusinessManagement.Migrations\BooksyClone.BusinessManagement.Migrations.csproj", "{3D13E380-E7FD-44AB-8A83-6A16956A9F78}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Schedules.Migrations", "BooksyClone.Schedules.Migrations\BooksyClone.Schedules.Migrations.csproj", "{D5B9D63F-7D5E-4539-B8FC-12F9F85D9D0E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksyClone.Schedules.Migrations", "src\migrations\BooksyClone.Schedules.Migrations\BooksyClone.Schedules.Migrations.csproj", "{D5B9D63F-7D5E-4539-B8FC-12F9F85D9D0E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BooksyClone.Dictionaries.Migrations", "BooksyClone.Dictionaries.Migrations\BooksyClone.Dictionaries.Migrations.csproj", "{61152842-5679-4AB8-AFFC-7688BB7764A9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BooksyClone.Dictionaries.Migrations", "src\migrations\BooksyClone.Dictionaries.Migrations\BooksyClone.Dictionaries.Migrations.csproj", "{61152842-5679-4AB8-AFFC-7688BB7764A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

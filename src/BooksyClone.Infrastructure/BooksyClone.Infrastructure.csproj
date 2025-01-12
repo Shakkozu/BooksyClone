@@ -24,12 +24,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BooksyClone.Auth.Migrations\BooksyClone.Auth.Migrations.csproj" />
-    <ProjectReference Include="..\BooksyClone.Availability.Migrations\BooksyClone.Availability.Migrations.csproj" />
-    <ProjectReference Include="..\BooksyClone.BusinessManagement.Migrations\BooksyClone.BusinessManagement.Migrations.csproj" />
-    <ProjectReference Include="..\BooksyClone.Dictionaries.Migrations\BooksyClone.Dictionaries.Migrations.csproj" />
-    <ProjectReference Include="..\BooksyClone.Schedules.Migrations\BooksyClone.Schedules.Migrations.csproj" />
-    <ProjectReference Include="..\BooksyClone.Search.Migrations\BooksyClone.Search.Migrations.csproj" />
+    <ProjectReference Include="..\migrations\BooksyClone.Auth.Migrations\BooksyClone.Auth.Migrations.csproj" />
+    <ProjectReference Include="..\migrations\BooksyClone.Availability.Migrations\BooksyClone.Availability.Migrations.csproj" />
+    <ProjectReference Include="..\migrations\BooksyClone.BusinessManagement.Migrations\BooksyClone.BusinessManagement.Migrations.csproj" />
+    <ProjectReference Include="..\migrations\BooksyClone.Dictionaries.Migrations\BooksyClone.Dictionaries.Migrations.csproj" />
+    <ProjectReference Include="..\migrations\BooksyClone.Schedules.Migrations\BooksyClone.Schedules.Migrations.csproj" />
+    <ProjectReference Include="..\migrations\BooksyClone.Search.Migrations\BooksyClone.Search.Migrations.csproj" />
   </ItemGroup>
 
 </Project>
