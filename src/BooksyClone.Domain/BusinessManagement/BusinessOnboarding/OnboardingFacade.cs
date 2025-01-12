@@ -4,21 +4,36 @@ using BooksyClone.Domain.Storage;
 using Microsoft.EntityFrameworkCore;
 using BooksyClone.Domain.BusinessOnboarding.FetchingBusinessCreationApplication;
 using BooksyClone.Contract.BusinessOnboarding;
+using FluentMigrator.Runner.Initialization;
+using Microsoft.Extensions.Configuration;
 
 namespace BooksyClone.Domain.BusinessOnboarding;
 
-internal class OnboardingFacade
+
+internal class OnboardingBuilder(IConfiguration configuration, IOnboardingEventsPublisher onboardingEventsPublisher)
+{
+    private readonly IConfiguration _configuration = configuration;
+    private readonly IOnboardingEventsPublisher _onboardingEventsPublisher = onboardingEventsPublisher;
+
+    internal OnboardingFacade Build()
+    {
+        var dbContext = new PostgresDbContext(_configuration.GetPostgresDatabaseConnectionString());
+        return new OnboardingFacade(dbContext, _onboardingEventsPublisher);
+    }
+    
+}
+public  class OnboardingFacade
 {
     private readonly PostgresDbContext _dbContext;
     private readonly IOnboardingEventsPublisher _onboardingEventsPublisher;
 
-    public OnboardingFacade(PostgresDbContext dbContext,
+    internal OnboardingFacade(PostgresDbContext dbContext,
         IOnboardingEventsPublisher onboardingEventsPublisher)
     {
         _dbContext = dbContext;
         _onboardingEventsPublisher = onboardingEventsPublisher;
     }
-    internal async Task<Guid> RegisterNewBusinessDraftAsync(BusinessDraft businessDraft,
+    public  async Task<Guid> RegisterNewBusinessDraftAsync(BusinessDraft businessDraft,
         CancellationToken ct)
     {
         await _dbContext.AddAndSave(businessDraft, ct);
@@ -30,7 +45,7 @@ internal class OnboardingFacade
         return businessDraft.Guid;
     }
 
-    internal async Task<FetchBusinessDraftStateResponse> FindById(Guid guid, CancellationToken ct)
+    public async Task<FetchBusinessDraftStateResponse> FindById(Guid guid, CancellationToken ct)
     {
         var draft = await _dbContext.BusinessDrafts.AsQueryable().SingleAsync(x => x.Guid == guid, ct);
         if (draft == null) throw new ArgumentNullException(nameof(draft));

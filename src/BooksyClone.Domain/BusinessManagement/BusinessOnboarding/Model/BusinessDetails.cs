@@ -2,7 +2,7 @@
 
 namespace BooksyClone.Domain.BusinessOnboarding.Model;
 
-internal class BusinessDetails
+public class BusinessDetails
 {
     public Guid Guid { get; set; }
     public string Name { get; set; }

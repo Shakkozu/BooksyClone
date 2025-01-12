@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace BooksyClone.Domain.BusinessOnboarding.Model;
 
-internal class BusinessDraft : BaseEntity
+public class BusinessDraft : BaseEntity
 {
     public UserDetails UserDetails { get; set; }
     public BusinessDetails BusinessDetails { get; set; }
@@ -16,7 +16,7 @@ internal class BusinessDraft : BaseEntity
     public bool LegalConsent { get; internal set; }
     public string LegalConsentContent { get; internal set; }
 
-    internal static BusinessDraft From(RegisterNewBusinessRequest contentBody)
+    public static BusinessDraft From(RegisterNewBusinessRequest contentBody)
     {
         var businessGuid = Guid.NewGuid();
         if (contentBody.LegalConsent == false)

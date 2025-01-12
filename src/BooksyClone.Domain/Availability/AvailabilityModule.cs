@@ -23,6 +23,7 @@ public static class AvailabilityModule
         services.AddTransient<IDbConnection>(sp => new NpgsqlConnection(configuration.GetValue<string>(AvailabilityConnectionStringKey)));
         return services;
     }
+    
 
     public static IEndpointRouteBuilder InstallAvailabilityModuleEndpoints(this IEndpointRouteBuilder endpoints)
     {
