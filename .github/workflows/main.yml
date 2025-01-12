@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Copy appsettings.json
-        run: cp ./BooksyClone/appsettings.Tests.json ./BooksyClone/appsettings.json
+        run: cp ./src/BooksyClone/appsettings.Tests.json ./src/BooksyClone/appsettings.json
 
       - name: Start containers
         run: docker compose -f "docker-compose.ci.yml" up -d
