@@ -2,8 +2,6 @@ using System.Net.Http.Json;
 using System.Text;
 using BooksyClone.Contract.BusinessManagement;
 using BooksyClone.Contract.Shared;
-using BooksyClone.Domain.BusinessOnboarding.RegisteringANewBusiness;
-using BooksyClone.Tests.BusinessOnboarding;
 using FluentAssertions;
 using Newtonsoft.Json;
 
@@ -24,7 +22,7 @@ public class ConfiguringBusinessServicesTests
     {
         _app.Dispose();
     }
-    
+
     [Test]
     public async Task ShouldConfigureServiceVariantsOfferedByBusiness()
     {
@@ -34,7 +32,7 @@ public class ConfiguringBusinessServicesTests
         var manHaircutServiceVariantId = genericServiceVariants.Single(x => x.Name == "Strzyżenie męskie").Id;
         var beardServiceVariantId = genericServiceVariants.Single(x => x.Name == "Broda").Id;
         var hairdressingCategoryId = genericServiceVariants.Single(x => x.Name == "Strzyżenie męskie").CategoryId;
-        var endpointRoute = $"/api/v1/companies/{businessUnitId}/business-services-configuration";
+        var endpointRoute = $"/api/v1/companies/{businessUnitId}/services-configuration";
         var updateBusinessConfigurationRequest = new BusinessConfigurationDto
         {
             BusinessUnitId = businessUnitId,
@@ -59,10 +57,10 @@ public class ConfiguringBusinessServicesTests
                 }
             ]
         };
-        
+
         var content = new StringContent(JsonConvert.SerializeObject(updateBusinessConfigurationRequest), Encoding.UTF8, "application/json");
         var response = await _app.CreateHttpClient().PostAsync(endpointRoute, content);
-        
+
         response.EnsureSuccessStatusCode();
         var businessConfiguration = await _app.CreateHttpClient().GetAsync($"api/v1/companies/{businessUnitId}/business-services-configuration");
         var businessConfigurationDto = await businessConfiguration.Content.ReadFromJsonAsync<BusinessConfigurationDto>();
