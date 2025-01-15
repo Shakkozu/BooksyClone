@@ -9,9 +9,16 @@ namespace BooksyClone.Domain.BusinessManagement;
 
 public class BusinessManagementFacade
 {
-    public Task<Result> ConfigureServicesOfferedByBusiness(BusinessConfigurationDto businessConfigurationDto)
+    private readonly ConfigureServiceVariantsOfferedByBusiness _configureServiceVariantsOfferedByBusiness;
+
+    internal BusinessManagementFacade(ConfigureServiceVariantsOfferedByBusiness configureServiceVariantsOfferedByBusiness)
     {
-        throw new NotImplementedException();
+        _configureServiceVariantsOfferedByBusiness = configureServiceVariantsOfferedByBusiness;
+    }
+
+    public async Task<Result> ConfigureServicesOfferedByBusiness(BusinessConfigurationDto businessConfigurationDto, CancellationToken ct)
+    {
+        return await _configureServiceVariantsOfferedByBusiness.HandleAsync(businessConfigurationDto, ct);
     }
 }
 
