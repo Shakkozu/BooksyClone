@@ -36,7 +36,6 @@ public class ConfiguringBusinessServicesTests
         var updateBusinessConfigurationRequest = new BusinessConfigurationDto
         {
             BusinessUnitId = businessUnitId,
-            EmployeeId = registeredUserId,
             OfferedServices = [
                 new OfferedServiceDto
                 {
@@ -51,7 +50,7 @@ public class ConfiguringBusinessServicesTests
                     Duration = TimeSpan.FromMinutes(90),
                     Price = Money.PLN(140),
                     Order = 1,
-                    EmployeesOfferingService = [registeredUserId],
+                    EmployeeId = registeredUserId,
                     CategoryId = (ulong)hairdressingCategoryId,
                     GenericServiceVariantsIds = [(ulong)manHaircutServiceVariantId, (ulong)beardServiceVariantId],
                 }
@@ -66,6 +65,6 @@ public class ConfiguringBusinessServicesTests
         var businessConfigurationDto = await businessConfiguration.Content.ReadFromJsonAsync<BusinessConfigurationDto>();
         businessConfigurationDto!.OfferedServices.Should().ContainEquivalentOf(updateBusinessConfigurationRequest.OfferedServices.First());
         businessConfigurationDto!.BusinessUnitId.Should().Be(businessUnitId);
-        businessConfigurationDto!.EmployeeId.Should().Be(registeredUserId);
+        businessConfigurationDto!.OfferedServices.First().EmployeeId.Should().Be(registeredUserId);
     }
 }

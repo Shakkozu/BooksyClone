@@ -14,7 +14,7 @@ public class CreateEmployeeServicesTable : Migration
             .WithColumn("business_id").AsGuid().NotNullable()
             .WithColumn("name").AsString(255).NotNullable()
             .WithColumn("markdown_description").AsString().Nullable()
-            .WithColumn("generic_service_variants_ids").AsCustom("jsonb").NotNullable()
+            .WithColumn("generic_service_variants_ids").AsCustom("INTEGER[]").NotNullable()
             .WithColumn("duration").AsTime().NotNullable()
             .WithColumn("price").AsCustom("jsonb").NotNullable()
             .WithColumn("order").AsInt32().NotNullable()

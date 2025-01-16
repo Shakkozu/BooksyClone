@@ -12,11 +12,11 @@ internal record EmployeeServiceDao(
     Guid BusinessId,
     string Name,
     string MarkdownDescription,
-    List<ulong> GenericServiceVariantsIds,
+    List<long> GenericServiceVariantsIds,
     TimeSpan Duration,
     Money Price,
     int Order,
-    ulong CategoryId
+    long CategoryId
 );
 
 internal class ConfigureServiceVariantsOfferedByBusiness(DbConnectionFactory _dbConnectionFactory)
@@ -29,8 +29,8 @@ internal class ConfigureServiceVariantsOfferedByBusiness(DbConnectionFactory _db
         generic_service_variants_ids, duration, price, ""order"", category_id)
     VALUES (
         @Guid, @EmployeeId, @BusinessId, @Name, @MarkdownDescription,
-        @GenericServiceVariantsIds, @Duration, @Price, @Order, @CategoryId)
-    ON CONFLICT (employee_id, service_id) DO UPDATE
+        @GenericServiceVariantsIds, @Duration, @Price::jsonb, @Order, @CategoryId)
+    ON CONFLICT (guid) DO UPDATE
     SET name = EXCLUDED.name,
         markdown_description = EXCLUDED.markdown_description,
         generic_service_variants_ids = EXCLUDED.generic_service_variants_ids,
@@ -45,11 +45,11 @@ internal class ConfigureServiceVariantsOfferedByBusiness(DbConnectionFactory _db
             businessConfigurationDto.BusinessUnitId,
             x.Name,
             x.MarkdownDescription,
-            x.GenericServiceVariantsIds,
+            x.GenericServiceVariantsIds.Select(serviceVariantId => (long)serviceVariantId).ToList(),
             x.Duration,
             x.Price,
             x.Order,
-            x.CategoryId
+            (long)x.CategoryId
         )).ToList();
         
             
@@ -65,7 +65,7 @@ internal class ConfigureServiceVariantsOfferedByBusiness(DbConnectionFactory _db
                 dao.BusinessId,
                 dao.Name,
                 dao.MarkdownDescription,
-                GenericServiceVariantsIds = JsonConvert.SerializeObject(dao.GenericServiceVariantsIds),
+                dao.GenericServiceVariantsIds,
                 dao.Duration,
                 Price = JsonConvert.SerializeObject(dao.Price),
                 dao.Order,
