@@ -30,7 +30,7 @@ public class BusinessManagementFacade
         return await _configureServiceVariantsOfferedByBusiness.HandleAsync(businessServiceConfigurationDto, ct);
     }
 
-    public async Task<object?> GetBusinessConfigurationAsync(Guid businessUnitId, CancellationToken ct)
+    public async Task<BusinessServiceConfigurationDto?> GetBusinessConfigurationAsync(Guid businessUnitId, CancellationToken ct)
     {
         return await _getBusinessConfiguration.HandleAsync(businessUnitId, ct);
     }

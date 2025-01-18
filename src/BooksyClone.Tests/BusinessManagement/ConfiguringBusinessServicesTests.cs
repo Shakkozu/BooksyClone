@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 using BooksyClone.Contract.BusinessManagement;
@@ -21,6 +22,30 @@ public class ConfiguringBusinessServicesTests
     public void OneTimeTearDown()
     {
         _app.Dispose();
+    }
+    
+    [Test]
+    public async Task ShouldReturnNotFoundForNonExistingBusiness()
+    {
+        var endpointRoute = $"/api/v1/companies/{Guid.NewGuid()}/services-configuration";
+
+        var response = await _app.CreateHttpClient().GetAsync(endpointRoute);
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Test]
+    public async Task ShouldReturnEmptyConfigurationForExistingButNotYetConfiguredBusiness()
+    {
+        var businessUnitId = await _app.OnboardingFixture.ABusinessExists(Guid.NewGuid());
+        var endpointRoute = $"/api/v1/companies/{businessUnitId}/services-configuration";
+
+        var response = await _app.CreateHttpClient().GetAsync(endpointRoute);
+
+        response.EnsureSuccessStatusCode();
+        var businessConfiguration = await response.Content.ReadFromJsonAsync<BusinessServiceConfigurationDto>();
+        businessConfiguration!.BusinessUnitId.Should().Be(businessUnitId);
+        businessConfiguration!.OfferedServices.Should().BeEmpty();
     }
 
     [Test]

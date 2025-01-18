@@ -1,6 +1,7 @@
 using BooksyClone.Contract.BusinessManagement;
 using BooksyClone.Contract.Shared;
 using BooksyClone.Domain.Availability.Storage;
+using BooksyClone.Domain.Shared.Exceptions;
 using Dapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -24,10 +25,16 @@ internal class GetBusinessConfiguration(DbConnectionFactory _dbConnectionFactory
         public long CategoryId { get; set; }
     }
 
-    internal async Task<BusinessServiceConfigurationDto> HandleAsync(Guid businessUnitId, CancellationToken ct)
+    internal async Task<BusinessServiceConfigurationDto?> HandleAsync(Guid businessUnitId, CancellationToken ct)
     {
         using var connection = _dbConnectionFactory.CreateConnection();
         connection.Open();
+        
+        var businessExists = await connection.ExecuteScalarAsync<bool>(
+            "SELECT EXISTS(SELECT 1 FROM business_management.business_drafts WHERE guid = @businessUnitId)",
+            new { businessUnitId });
+        if (!businessExists)
+            return null;
 
         const string query = @"
             SELECT
@@ -79,7 +86,9 @@ internal static class Route
             CancellationToken ct) =>
         {
             var result = await facade.GetBusinessConfigurationAsync(businessUnitId, ct);
-            return Results.Ok(result);
+            return result is null ?
+                Results.NotFound() :
+                Results.Ok(result);
         });
 
         return endpoints;
