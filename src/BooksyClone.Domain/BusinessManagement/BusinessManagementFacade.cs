@@ -2,6 +2,7 @@ using BooksyClone.Contract.BusinessManagement;
 using BooksyClone.Contract.Shared;
 using BooksyClone.Domain.Availability.Storage;
 using BooksyClone.Domain.BusinessManagement.ConfiguringServiceVariantsOfferedByBusiness;
+using BooksyClone.Domain.BusinessManagement.FetchingBusinessConfiguration;
 using BooksyClone.Domain.Storage;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -12,20 +13,28 @@ namespace BooksyClone.Domain.BusinessManagement;
 public class BusinessManagementFacade
 {
     private readonly ConfigureServiceVariantsOfferedByBusiness _configureServiceVariantsOfferedByBusiness;
+    private readonly GetBusinessConfiguration _getBusinessConfiguration;
 
     internal BusinessManagementFacade(
-        ConfigureServiceVariantsOfferedByBusiness configureServiceVariantsOfferedByBusiness)
+        ConfigureServiceVariantsOfferedByBusiness configureServiceVariantsOfferedByBusiness,
+        GetBusinessConfiguration getBusinessConfiguration)
     {
         _configureServiceVariantsOfferedByBusiness = configureServiceVariantsOfferedByBusiness;
+        _getBusinessConfiguration = getBusinessConfiguration;
     }
 
-    public async Task<Result> ConfigureServicesOfferedByBusiness(BusinessConfigurationDto businessConfigurationDto,
+    public async Task<Result> ConfigureServicesOfferedByBusiness(
+        BusinessServiceConfigurationDto businessServiceConfigurationDto,
         CancellationToken ct)
     {
-        return await _configureServiceVariantsOfferedByBusiness.HandleAsync(businessConfigurationDto, ct);
+        return await _configureServiceVariantsOfferedByBusiness.HandleAsync(businessServiceConfigurationDto, ct);
+    }
+
+    public async Task<object?> GetBusinessConfigurationAsync(Guid businessUnitId, CancellationToken ct)
+    {
+        return await _getBusinessConfiguration.HandleAsync(businessUnitId, ct);
     }
 }
-
 
 internal class BusinessManagementBuilder
 {
@@ -39,13 +48,12 @@ internal class BusinessManagementBuilder
     public BusinessManagementFacade Build()
     {
         return new BusinessManagementFacade(
-            new ConfigureServiceVariantsOfferedByBusiness(
-                new DbConnectionFactory(_configuration.GetPostgresDatabaseConnectionString())
-            )
+            new ConfigureServiceVariantsOfferedByBusiness(new DbConnectionFactory(_configuration.GetPostgresDatabaseConnectionString())),
+            new GetBusinessConfiguration(new DbConnectionFactory(_configuration.GetPostgresDatabaseConnectionString()))
         );
     }
-    
 }
+
 public static class BusinessManagementModule
 {
     public static void InstallBusinessManagementModule(this IServiceCollection services, IConfiguration config)
@@ -60,5 +68,6 @@ public static class BusinessManagementModule
     public static void MapBusinessManagementEndpoints(this IEndpointRouteBuilder endpoints)
     {
         endpoints.MapConfigureServiceVariantsOfferedByBusinessEndpoint();
+        endpoints.MapGetBusinessConfigurationEndpoint();
     }
 }

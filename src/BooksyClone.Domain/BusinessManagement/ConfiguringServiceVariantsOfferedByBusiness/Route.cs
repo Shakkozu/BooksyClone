@@ -13,7 +13,7 @@ internal static class Route
         endpoints.MapPost("/api/v1/companies/{businessUnitId}/services-configuration", async (HttpContext context,
             BusinessManagementFacade facade,
             CancellationToken ct,
-            [FromBody] BusinessConfigurationDto dto) =>
+            [FromBody] BusinessServiceConfigurationDto dto) =>
         {
             await facade.ConfigureServicesOfferedByBusiness(dto, ct);
             return Results.NoContent();

@@ -1,9 +1,11 @@
+using Newtonsoft.Json;
+
 namespace BooksyClone.Contract.Shared;
 
 public class Money
 {
-    public decimal Amount { get; set; }
-    public string Currency { get; set; }
+    public decimal Amount { get; }
+    public string Currency { get; }
 
     public Money(decimal amount, string currency)
     {
@@ -52,7 +54,13 @@ public class Money
     {
         return $"{Amount} {Currency}";
     }
-    
-    
-    
+
+
+    public static Money FromJson(string argPrice)
+    {
+        var jsonMoney = JsonConvert.DeserializeObject<Money>(argPrice);
+        if(jsonMoney == null)
+            throw new ArgumentException("Invalid json format");
+        return new Money(jsonMoney.Amount, jsonMoney.Currency);
+    }
 }

@@ -6,22 +6,50 @@ using Newtonsoft.Json;
 
 namespace BooksyClone.Domain.BusinessManagement.ConfiguringServiceVariantsOfferedByBusiness;
 
-internal record EmployeeServiceDao(
-    Guid Guid,
-    Guid EmployeeId,
-    Guid BusinessId,
-    string Name,
-    string MarkdownDescription,
-    List<long> GenericServiceVariantsIds,
-    TimeSpan Duration,
-    Money Price,
-    int Order,
-    long CategoryId
-);
+internal record EmployeeServiceDao
+{
+    public EmployeeServiceDao()
+    {     }
+
+    public EmployeeServiceDao(Guid Guid,
+        Guid EmployeeId,
+        Guid BusinessId,
+        string Name,
+        string MarkdownDescription,
+        List<long> GenericServiceVariantsIds,
+        TimeSpan Duration,
+        Money Price,
+        int Order,
+        long CategoryId)
+    {
+        this.Guid = Guid;
+        this.EmployeeId = EmployeeId;
+        this.BusinessId = BusinessId;
+        this.Name = Name;
+        this.MarkdownDescription = MarkdownDescription;
+        this.GenericServiceVariantsIds = GenericServiceVariantsIds;
+        this.Duration = Duration;
+        this.Price = Price;
+        this.Order = Order;
+        this.CategoryId = CategoryId;
+    }
+
+    public Guid Guid { get; set; }
+    public Guid EmployeeId { get; set; }
+    public Guid BusinessId { get; set; }
+    public string Name { get; set; }
+    public string MarkdownDescription { get; set; }
+    public List<long> GenericServiceVariantsIds { get; set; }
+    public TimeSpan Duration { get; set; }
+    public Money Price { get; set; }
+    public int Order { get; set; }
+    public long CategoryId { get; set; }
+
+}
 
 internal class ConfigureServiceVariantsOfferedByBusiness(DbConnectionFactory _dbConnectionFactory)
 {
-    internal async Task<Result> HandleAsync(BusinessConfigurationDto businessConfigurationDto, CancellationToken ct)
+    internal async Task<Result> HandleAsync(BusinessServiceConfigurationDto businessServiceConfigurationDto, CancellationToken ct)
     {
         using var connection = _dbConnectionFactory.CreateConnection();
         const string command = @"INSERT INTO business_management.employee_services (
@@ -39,10 +67,10 @@ internal class ConfigureServiceVariantsOfferedByBusiness(DbConnectionFactory _db
         ""order"" = EXCLUDED.""order"",
         category_id = EXCLUDED.category_id
 ";
-        var daos = businessConfigurationDto.OfferedServices.Select(x => new EmployeeServiceDao(
-            Guid.NewGuid(),
+        var daos = businessServiceConfigurationDto.OfferedServices.Select(x => new EmployeeServiceDao(
+            x.Guid,
             x.EmployeeId,
-            businessConfigurationDto.BusinessUnitId,
+            businessServiceConfigurationDto.BusinessUnitId,
             x.Name,
             x.MarkdownDescription,
             x.GenericServiceVariantsIds.Select(serviceVariantId => (long)serviceVariantId).ToList(),

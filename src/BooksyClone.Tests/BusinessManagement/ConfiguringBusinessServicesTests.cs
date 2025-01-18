@@ -33,7 +33,7 @@ public class ConfiguringBusinessServicesTests
         var beardServiceVariantId = genericServiceVariants.Single(x => x.Name == "Broda").Id;
         var hairdressingCategoryId = genericServiceVariants.Single(x => x.Name == "Strzyżenie męskie").CategoryId;
         var endpointRoute = $"/api/v1/companies/{businessUnitId}/services-configuration";
-        var updateBusinessConfigurationRequest = new BusinessConfigurationDto
+        var updateBusinessConfigurationRequest = new BusinessServiceConfigurationDto
         {
             BusinessUnitId = businessUnitId,
             OfferedServices = [
@@ -48,11 +48,11 @@ public class ConfiguringBusinessServicesTests
 *   _**Mycie głowy**_
 *   _**Pielęgnacja kosmetykami premium**_",
                     Duration = TimeSpan.FromMinutes(90),
-                    Price = Money.PLN(140),
+                    Price = Money.PLN(100.23m),
                     Order = 1,
                     EmployeeId = registeredUserId,
-                    CategoryId = (ulong)hairdressingCategoryId,
-                    GenericServiceVariantsIds = [(ulong)manHaircutServiceVariantId, (ulong)beardServiceVariantId],
+                    CategoryId = (long)hairdressingCategoryId,
+                    GenericServiceVariantsIds = [(long)manHaircutServiceVariantId, (long)beardServiceVariantId],
                 }
             ]
         };
@@ -61,8 +61,8 @@ public class ConfiguringBusinessServicesTests
         var response = await _app.CreateHttpClient().PostAsync(endpointRoute, content);
 
         response.EnsureSuccessStatusCode();
-        var businessConfiguration = await _app.CreateHttpClient().GetAsync($"api/v1/companies/{businessUnitId}/business-services-configuration");
-        var businessConfigurationDto = await businessConfiguration.Content.ReadFromJsonAsync<BusinessConfigurationDto>();
+        var businessConfiguration = await _app.CreateHttpClient().GetAsync($"api/v1/companies/{businessUnitId}/services-configuration");
+        var businessConfigurationDto = await businessConfiguration.Content.ReadFromJsonAsync<BusinessServiceConfigurationDto>();
         businessConfigurationDto!.OfferedServices.Should().ContainEquivalentOf(updateBusinessConfigurationRequest.OfferedServices.First());
         businessConfigurationDto!.BusinessUnitId.Should().Be(businessUnitId);
         businessConfigurationDto!.OfferedServices.First().EmployeeId.Should().Be(registeredUserId);
