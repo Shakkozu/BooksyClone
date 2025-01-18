@@ -1,13 +1,12 @@
-﻿
-
-
-
-using BooksyClone.Domain.Availability;
+﻿using BooksyClone.Domain.Availability;
+using BooksyClone.Domain.BusinessManagement;
+using BooksyClone.Domain.BusinessOnboarding;
 using BooksyClone.Domain.Dictionaries;
 using BooksyClone.Domain.Schedules;
 using BooksyClone.Infrastructure.RabbitMQStreams;
 using BooksyClone.Infrastructure.TimeManagement;
 using BooksyClone.Tests.Availability;
+using BooksyClone.Tests.BusinessOnboarding;
 using FakeItEasy;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -22,6 +21,7 @@ public class BooksyCloneApp : WebApplicationFactory<Program>
     private bool _reuseScope;
     private readonly Action<IServiceCollection> _customization;
     private ITimeService _timeService;
+
     private BooksyCloneApp(Action<IServiceCollection> customization, bool reuseScope = false)
     {
         _customization = customization;
@@ -48,6 +48,7 @@ public class BooksyCloneApp : WebApplicationFactory<Program>
             _scope.Dispose();
             _scope = Services.CreateAsyncScope();
         }
+
         return _scope;
     }
 
@@ -57,15 +58,12 @@ public class BooksyCloneApp : WebApplicationFactory<Program>
         UpdateCurrentAppTime(DateTime.Now);
 
         base.ConfigureWebHost(builder);
-        builder.ConfigureAppConfiguration(configurationBuilder =>
-        {
-
-        });
+        builder.ConfigureAppConfiguration(configurationBuilder => { });
         builder.ConfigureServices(collection =>
         {
             collection.AddSingleton<ITimeService>(_timeService);
             collection.AddSingleton<AvailabilityFixture>();
-
+            collection.AddSingleton<OnboardingFixture>();
         });
 
         builder.UseSetting("ASPNETCORE_ENVIRONMENT", "Tests");
@@ -75,14 +73,28 @@ public class BooksyCloneApp : WebApplicationFactory<Program>
 
     internal IEventPublisher GetEventPublisher => RequestScope().ServiceProvider.GetRequiredService<IEventPublisher>();
     internal SchedulesFacade SchedulesFacade => RequestScope().ServiceProvider.GetRequiredService<SchedulesFacade>();
-	internal DictionariesFacade DictionariesFacade => RequestScope().ServiceProvider.GetRequiredService<DictionariesFacade>();
 
-    internal AvailabilityFacade AvailabilityFacade => RequestScope().ServiceProvider.GetRequiredService<AvailabilityFacade>();
-    internal AvailabilityFixture AvailabilityFixture => RequestScope().ServiceProvider.GetRequiredService<AvailabilityFixture>();
+    internal DictionariesFacade DictionariesFacade =>
+        RequestScope().ServiceProvider.GetRequiredService<DictionariesFacade>();
+
+    internal AvailabilityFacade AvailabilityFacade =>
+        RequestScope().ServiceProvider.GetRequiredService<AvailabilityFacade>();
+
+    internal AvailabilityFixture AvailabilityFixture =>
+        RequestScope().ServiceProvider.GetRequiredService<AvailabilityFixture>();
+
     internal ITimeService ITimeService => RequestScope().ServiceProvider.GetRequiredService<ITimeService>();
 
+    public BusinessManagementFacade BusinessManagementFacade =>
+        RequestScope().ServiceProvider.GetRequiredService<BusinessManagementFacade>();
 
-	public HttpClient CreateHttpClient()
+    public OnboardingFacade OnboardingFacade => RequestScope().ServiceProvider.GetRequiredService<OnboardingFacade>();
+
+    internal OnboardingFixture OnboardingFixture =>
+        RequestScope().ServiceProvider.GetRequiredService<OnboardingFixture>();
+
+
+    public HttpClient CreateHttpClient()
     {
         return CreateClient();
     }

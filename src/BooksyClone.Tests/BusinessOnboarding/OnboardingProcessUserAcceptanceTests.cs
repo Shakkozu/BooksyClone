@@ -12,8 +12,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System.Net;
 using System.Net.Http.Json;
+using BooksyClone.Contract.Availability;
 
 namespace BooksyClone.Tests.BusinessOnboarding;
+
 [TestFixture]
 public class OnboardingProcessUserAcceptanceTests
 {
@@ -28,6 +30,7 @@ public class OnboardingProcessUserAcceptanceTests
     private MultipartFormDataContent _formData;
     private HttpResponseMessage _response;
     private Guid _businessDraftId;
+    private OnboardingFixture _fixture;
 
     [OneTimeSetUp]
     public void Setup()
@@ -39,6 +42,7 @@ public class OnboardingProcessUserAcceptanceTests
         {
             services.AddSingleton<IOnboardingEventsPublisher>(_fakeEventPublisher);
         });
+        _fixture = new OnboardingFixture(_app.OnboardingFacade);
     }
 
     [TearDown]
@@ -69,7 +73,7 @@ public class OnboardingProcessUserAcceptanceTests
 * */
 
     [Test]
-    public void OnboadringProcessScenarioTest()
+    public void OnboardingProcessScenarioTest()
     {
         GivenApplicationUserFillsRegistrationFormToRegisterANewBusinessWithCorrectData();
         AndUserConfirmedLegalConsentThatProvidedDataIsAccurate();
@@ -82,26 +86,9 @@ public class OnboardingProcessUserAcceptanceTests
 
     private void GivenApplicationUserFillsRegistrationFormToRegisterANewBusinessWithCorrectData()
     {
-        _request = new RegisterNewBusinessRequest
-        {
-            BusinessAddress = _generator.Address.FullAddress(),
-            BusinessName = _generator.Company.CompanyName(),
-            BusinessType = BusinessType.Barber,
-            BusinessEmail = _generator.Internet.Email(),
-            BusinessNIP = "7755446779",
-            CorrelationId = Guid.NewGuid(),
-            Timestamp = DateTime.Today.AddHours(15).ToUniversalTime(),
-            UserEmail = _generator.Person.Email,
-            BusinessPhoneNumber = _generator.Phone.PhoneNumber("#########"),
-            UserFullName = _generator.Person.FullName,
-            UserIdNumber = _generator.Person.Pesel(),
-            UserId = _userId,
-            UserPhoneNumber = _generator.Phone.PhoneNumber("#########"),
-            LegalConsent = true,
-            LegalConsentContent = _legalConsent,
-        };
-        _businessProofDocument = CreateFakeFormFile("businessIdentificationDocument.jpg", "test");
-        _userIdentityDocument = CreateFakeFormFile("userIdentity.jpg", "test");
+        _request = _fixture.ACreateNewBusinessDraftRequest(_userId);
+        _businessProofDocument = _request.BusinessProofDocument;
+        _userIdentityDocument = _request.UserIdentityDocument;
         var httpClient = _app.CreateHttpClient();
 
         _formData = new MultipartFormDataContent

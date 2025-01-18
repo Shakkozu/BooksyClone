@@ -13,9 +13,11 @@ public static class OnboardingModule
 {
     public static void InstallOnboardingModule(this IServiceCollection serviceProvider, IConfiguration configuration)
     {
-        serviceProvider.AddTransient<OnboardingFacade>();
         serviceProvider.AddQueryable<BusinessDraft, PostgresDbContext>();
         serviceProvider.AddSingleton<IOnboardingEventsPublisher, OnboardingRabbitStreamsEventsPublisher>(_ => new OnboardingRabbitStreamsEventsPublisher(GetProducerConfiguration(configuration)));
+        serviceProvider.AddTransient<OnboardingFacade>(sp =>   
+            new OnboardingBuilder(configuration, sp.GetRequiredService<IOnboardingEventsPublisher>()).Build()
+        );
     }
 
     public static IEndpointRouteBuilder InstallOnbardingModuleEndpoints(this IEndpointRouteBuilder endpoints)

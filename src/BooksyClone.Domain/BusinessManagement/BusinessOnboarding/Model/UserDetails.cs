@@ -1,6 +1,6 @@
 ﻿namespace BooksyClone.Domain.BusinessOnboarding.Model;
 
-internal class UserDetails
+public class UserDetails
 {
     public Guid Guid { get; set; }
     public string FullName { get; set; }

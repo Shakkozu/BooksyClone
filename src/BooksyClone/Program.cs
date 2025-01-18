@@ -1,4 +1,3 @@
-
 using Serilog;
 using BooksyClone.Domain.BusinessOnboarding;
 using BooksyClone.Domain.Storage;
@@ -7,6 +6,8 @@ using BooksyClone.Infrastructure.Migrations;
 using BooksyClone.Domain.Availability;
 using BooksyClone.Domain.Auth;
 using BooksyClone.Domain.Dictionaries;
+using BooksyClone.Domain.BusinessManagement;
+using BooksyClone.Domain.BusinessOnboarding.RegisteringANewBusiness;
 
 namespace BooksyClone;
 
@@ -37,9 +38,10 @@ public class Program
         builder.Services.InstallSchedulesModule(config);
         builder.Services.InstallAvailabilityModule(config);
         builder.Services.InstallAuthModule(config);
-		builder.Services.InstallDictionariesModule(config);
+        builder.Services.InstallDictionariesModule(config);
+        builder.Services.InstallBusinessManagementModule(config);
         builder.Services.AddAntiforgery();
-		builder.Host.UseSerilog(Log.Logger);
+        builder.Host.UseSerilog(Log.Logger);
 
         var app = builder.Build();
 
@@ -52,21 +54,21 @@ public class Program
 
         using (var serviceScope = app.Services.CreateScope())
         {
-			MigrationsRunner.RunMigrations(connectionString);
+            MigrationsRunner.RunMigrations(connectionString);
         }
 
         app.InstallOnbardingModuleEndpoints();
         app.InstallSchedulesModuleEndpoints();
         app.InstallAvailabilityModuleEndpoints();
-		app.MapAuthenticationModuleEndpoints();
-		app.MapDictionariesModuleEndpoints();
+        app.MapAuthenticationModuleEndpoints();
+        app.MapDictionariesModuleEndpoints();
+        app.MapBusinessManagementEndpoints();
 
-		app.UseHttpsRedirection();
+        app.UseHttpsRedirection();
 
-		app.UseAuthentication();
+        app.UseAuthentication();
         app.UseAuthorization();
         app.UseAntiforgery();
-
 
         app.MapControllers();
 
