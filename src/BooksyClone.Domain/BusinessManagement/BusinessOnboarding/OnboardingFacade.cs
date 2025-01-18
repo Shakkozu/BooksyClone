@@ -5,23 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using BooksyClone.Domain.BusinessOnboarding.FetchingBusinessCreationApplication;
 using BooksyClone.Contract.BusinessOnboarding;
 using FluentMigrator.Runner.Initialization;
-using Microsoft.Extensions.Configuration;
 
 namespace BooksyClone.Domain.BusinessOnboarding;
 
-
-internal class OnboardingBuilder(IConfiguration configuration, IOnboardingEventsPublisher onboardingEventsPublisher)
-{
-    private readonly IConfiguration _configuration = configuration;
-    private readonly IOnboardingEventsPublisher _onboardingEventsPublisher = onboardingEventsPublisher;
-
-    internal OnboardingFacade Build()
-    {
-        var dbContext = new PostgresDbContext(_configuration.GetPostgresDatabaseConnectionString());
-        return new OnboardingFacade(dbContext, _onboardingEventsPublisher);
-    }
-    
-}
 public  class OnboardingFacade
 {
     private readonly PostgresDbContext _dbContext;
