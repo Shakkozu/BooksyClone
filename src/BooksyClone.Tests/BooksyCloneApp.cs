@@ -10,6 +10,7 @@ using BooksyClone.Tests.BusinessOnboarding;
 using FakeItEasy;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
@@ -92,7 +93,6 @@ public class BooksyCloneApp : WebApplicationFactory<Program>
 
     internal OnboardingFixture OnboardingFixture =>
         RequestScope().ServiceProvider.GetRequiredService<OnboardingFixture>();
-
 
     public HttpClient CreateHttpClient()
     {

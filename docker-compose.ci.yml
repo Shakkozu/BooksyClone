@@ -19,3 +19,10 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
       POSTGRES_DB: booksyclone
+  papercut:
+    image: changemakerstudiosus/papercut-smtp
+    container_name: papercut
+    ports:
+      - "25:25"
+      - "2525:2525"
+
