@@ -7,18 +7,27 @@ public static class EmailSenderInstaller
 {
 	public static IServiceCollection AddEmailSender(this IServiceCollection services, IConfiguration config)
 	{
-		var useFakeEmailSender = bool.Parse(config.GetRequiredSection("EmailSender:UseFakeEmailSender").Value!);
-		if (useFakeEmailSender)
+		var emailConfig = GetEmailConfiguration(config);
+		if (emailConfig.UseFakeEmailSender)
 			services.AddSingleton<IEmailSender, FakeEmailSender>();
 		else
-			services.AddSingleton<IEmailSender>(new EmailSender(GetEmailConfig(config)));
+			services.AddSingleton<IEmailSender>(new EmailSender(GetEmailSmtpConfig(config)));
 
 		return services;
 	}
 
-	public static EmailSenderConfiguration GetEmailConfig(IConfiguration config)
+
+	public static EmailConfiguration GetEmailConfiguration(this IConfiguration configuration)
 	{
-		return new EmailSenderConfiguration
+		return new EmailConfiguration
+		{
+			Smtp = GetEmailSmtpConfig(configuration),
+			UseFakeEmailSender = bool.Parse(configuration.GetRequiredSection("EmailSender:UseFakeEmailSender").Value!)
+		};
+	}
+	public static EmailSenderSmtpConfiguration GetEmailSmtpConfig(this IConfiguration config)
+	{
+		return new EmailSenderSmtpConfiguration
 		{
 			SmtpServer = config.GetSection("EmailSender:Smtp:Host").Value!,
 			SmtpPort = int.Parse(config.GetSection("EmailSender:Smtp:Port").Value!),

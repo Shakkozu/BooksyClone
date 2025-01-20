@@ -93,6 +93,8 @@ public class BooksyCloneApp : WebApplicationFactory<Program>
 
     internal OnboardingFixture OnboardingFixture =>
         RequestScope().ServiceProvider.GetRequiredService<OnboardingFixture>();
+    
+    internal IConfiguration Configuration => RequestScope().ServiceProvider.GetRequiredService<IConfiguration>();
 
     public HttpClient CreateHttpClient()
     {
