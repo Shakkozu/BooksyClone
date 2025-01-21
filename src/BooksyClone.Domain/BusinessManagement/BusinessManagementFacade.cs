@@ -10,17 +10,17 @@ public class BusinessManagementFacade
 {
     private readonly ConfigureServiceVariantsOfferedByBusiness _configureServiceVariantsOfferedByBusiness;
     private readonly GetBusinessConfiguration _getBusinessConfiguration;
-	private readonly RegisterNewEmployee _registerNewEmployee;
+    private readonly RegisterNewEmployee _registerNewEmployee;
 
-	internal BusinessManagementFacade(
+    internal BusinessManagementFacade(
         ConfigureServiceVariantsOfferedByBusiness configureServiceVariantsOfferedByBusiness,
         GetBusinessConfiguration getBusinessConfiguration,
-		RegisterNewEmployee registerNewEmployee)
+        RegisterNewEmployee registerNewEmployee)
     {
         _configureServiceVariantsOfferedByBusiness = configureServiceVariantsOfferedByBusiness;
         _getBusinessConfiguration = getBusinessConfiguration;
-		_registerNewEmployee = registerNewEmployee;
-	}
+        _registerNewEmployee = registerNewEmployee;
+    }
 
     public async Task<Result> ConfigureServicesOfferedByBusiness(
         BusinessServiceConfigurationDto businessServiceConfigurationDto,
@@ -34,8 +34,13 @@ public class BusinessManagementFacade
         return await _getBusinessConfiguration.HandleAsync(businessUnitId, ct);
     }
 
-	public async Task RegisterNewEmployeeAsync(RegisterNewEmployeeRequest registerNewEmployeeRequest, CancellationToken ct)
-	{
-		await _registerNewEmployee.HandleAsync(registerNewEmployeeRequest, ct);
-	}
+    public Task<Result> RegisterEmployeeAccountUsingNewEmployeeTokenAsync(RegisterEmployeeAccountUsingNewEmployeeTokenRequest registerEmployeeAccountUsingTokenRequest)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<RegistrationToken> RegisterNewEmployeeToBusinessAsync(RegisterNewEmployeeRequest registerNewEmployeeRequest, CancellationToken ct)
+    {
+        return await _registerNewEmployee.HandleAsync(registerNewEmployeeRequest, ct);
+    }
 }

@@ -10,23 +10,23 @@ namespace BooksyClone.Domain.BusinessManagement;
 
 public class BusinessManagementBuilder(IConfiguration configuration)
 {
-	public BusinessManagementFacade Build()
-	{
-		var connectionString = configuration.GetPostgresDatabaseConnectionString();
-		return new BusinessManagementFacade(
-			new ConfigureServiceVariantsOfferedByBusiness(new DbConnectionFactory(connectionString)),
-			new GetBusinessConfiguration(new DbConnectionFactory(connectionString)),
-			new RegisterNewEmployee(new EmailSender(configuration.GetEmailSmtpConfig()), new DbConnectionFactory(connectionString))
-		);
-	}
+    public BusinessManagementFacade Build()
+    {
+        var connectionString = configuration.GetPostgresDatabaseConnectionString();
+        return new BusinessManagementFacade(
+            new ConfigureServiceVariantsOfferedByBusiness(new DbConnectionFactory(connectionString)),
+            new GetBusinessConfiguration(new DbConnectionFactory(connectionString)),
+            new RegisterNewEmployee(new DbConnectionFactory(connectionString))
+        );
+    }
 
-	public BusinessManagementFacade Build(IEmailSender emailSender, IConfiguration configuration1)
-	{
-		var connectionString = configuration.GetPostgresDatabaseConnectionString();
-		return new BusinessManagementFacade(
-			new ConfigureServiceVariantsOfferedByBusiness(new DbConnectionFactory(connectionString)),
-			new GetBusinessConfiguration(new DbConnectionFactory(connectionString)),
-			new RegisterNewEmployee(emailSender, new DbConnectionFactory(connectionString))
-			);
-	}
+    public BusinessManagementFacade Build(IConfiguration configuration1)
+    {
+        var connectionString = configuration.GetPostgresDatabaseConnectionString();
+        return new BusinessManagementFacade(
+            new ConfigureServiceVariantsOfferedByBusiness(new DbConnectionFactory(connectionString)),
+            new GetBusinessConfiguration(new DbConnectionFactory(connectionString)),
+            new RegisterNewEmployee(new DbConnectionFactory(connectionString))
+            );
+    }
 }
