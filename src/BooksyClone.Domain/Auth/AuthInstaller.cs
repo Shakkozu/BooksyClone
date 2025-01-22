@@ -63,6 +63,19 @@ public static class AuthInstaller
 			return new HttpContextUserIdProvider(httpContextAccessor);
 		});
 
+		services.AddScoped(provider =>
+		{
+			var userManager = serviceBuilder.GetRequiredService<UserManager<IdentityUser>>();
+			var signInManager = serviceBuilder.GetRequiredService<SignInManager<IdentityUser>>();
+			var roleManager = serviceBuilder.GetRequiredService<RoleManager<IdentityRole>>();
+			return new AuthFacade(
+				new RegisterUserCommandHandler(userManager),
+				new LoginUserCommandHandler(userManager, signInManager, roleManager, configuration),
+				new HttpContextUserIdProvider(provider.GetRequiredService<IHttpContextAccessor>()),
+				new GetUserIdByEmailHandlerQueryHandler(userManager)
+				);
+		});
+
 		return services;
 	}
 
