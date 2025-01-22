@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BooksyClone.Domain.Auth.Login;
 
@@ -9,11 +9,11 @@ internal static class Route
 {
 	internal static IEndpointRouteBuilder MapLoginEndpoint(this IEndpointRouteBuilder routeBuilder)
 	{
-		routeBuilder.MapPost("/api/accounts/login", async context =>
+		routeBuilder.MapPost("/api/accounts/login", async (HttpContext context,
+			[FromServices] AuthFacade authFacade) =>
 		{
 			var command = await context.Request.ReadFromJsonAsync<LoginUserDto>();
-			var handler = context.RequestServices.GetRequiredService<LoginUserCommandHandler>();
-			var result = await handler.HandleAsync(command, context.RequestAborted);
+			var result = await authFacade.LoginUserAsync(command, context.RequestAborted);
 			if (result.Success)
 			{
 				await context.Response.WriteAsJsonAsync(result);

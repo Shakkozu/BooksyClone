@@ -1,8 +1,9 @@
 ﻿using BooksyClone.Domain.Auth.FetchingUserFromHttpContext;
 using BooksyClone.Domain.Auth.GettingUserIdByEmail;
 using BooksyClone.Domain.Auth.Login;
+using BooksyClone.Domain.Auth.RegisterUser;
 
-namespace BooksyClone.Domain.Auth.RegisterUser;
+namespace BooksyClone.Domain.Auth;
 
 public class AuthFacade
 {
@@ -11,7 +12,8 @@ public class AuthFacade
 	private readonly HttpContextUserIdProvider _fetchUserIdentifierFromContext;
 	private readonly GetUserIdByEmailHandlerQueryHandler _getUserIdByEmailHandlerQueryHandler;
 
-	internal AuthFacade(RegisterUserCommandHandler registerUserCommandHandler,
+	internal AuthFacade(
+		RegisterUserCommandHandler registerUserCommandHandler,
 		LoginUserCommandHandler loginUserCommandHandler,
 		HttpContextUserIdProvider fetchUserIdentifierFromContext,
 		GetUserIdByEmailHandlerQueryHandler getUserIdByEmailHandlerQueryHandler)

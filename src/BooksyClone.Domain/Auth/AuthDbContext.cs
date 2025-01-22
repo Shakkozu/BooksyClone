@@ -8,6 +8,10 @@ public class AuthorizationDbContext : IdentityDbContext<IdentityUser>
 {
 	public DbSet<IdentityUser> Users { get; set; }
 
+	public AuthorizationDbContext(string connectionString) : base(new DbContextOptionsBuilder<AuthorizationDbContext>().UseNpgsql(connectionString).Options)
+	{
+	}
+
 	public AuthorizationDbContext(DbContextOptions<AuthorizationDbContext> options) : base(options)
 	{
 	}

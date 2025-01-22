@@ -1,4 +1,5 @@
-﻿using BooksyClone.Domain.Auth.GettingUserIdByEmail;
+﻿using BooksyClone.Domain.Auth;
+using BooksyClone.Domain.Auth.GettingUserIdByEmail;
 using BooksyClone.Domain.Auth.Login;
 using BooksyClone.Domain.Auth.RegisterUser;
 using Microsoft.Extensions.Configuration;
