@@ -65,9 +65,9 @@ public static class AuthInstaller
 
 		services.AddScoped(provider =>
 		{
-			var userManager = serviceBuilder.GetRequiredService<UserManager<IdentityUser>>();
-			var signInManager = serviceBuilder.GetRequiredService<SignInManager<IdentityUser>>();
-			var roleManager = serviceBuilder.GetRequiredService<RoleManager<IdentityRole>>();
+			var userManager = provider.GetRequiredService<UserManager<IdentityUser>>();
+			var signInManager = provider.GetRequiredService<SignInManager<IdentityUser>>();
+			var roleManager = provider.GetRequiredService<RoleManager<IdentityRole>>();
 			return new AuthFacade(
 				new RegisterUserCommandHandler(userManager),
 				new LoginUserCommandHandler(userManager, signInManager, roleManager, configuration),
