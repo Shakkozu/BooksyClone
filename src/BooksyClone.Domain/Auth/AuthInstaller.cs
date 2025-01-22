@@ -22,6 +22,7 @@ internal record JwtSettings
 	public string Audience { get; init; }
 	public int TokenExpirationInMinutes { get; init; }
 }
+
 public static class AuthInstaller
 {
 	public static IServiceCollection InstallAuthModule(this IServiceCollection services, IConfiguration configuration)
@@ -56,7 +57,7 @@ public static class AuthInstaller
 			};
 		});
 		services.AddScoped<HttpContextAccessor>();
-		services.AddScoped<IFetchUserIdentifierFromContext>(provider =>
+		services.AddScoped(provider =>
 		{
 			var httpContextAccessor = provider.GetRequiredService<IHttpContextAccessor>();
 			return new HttpContextUserIdProvider(httpContextAccessor);

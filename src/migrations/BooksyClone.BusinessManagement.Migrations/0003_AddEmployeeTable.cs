@@ -9,7 +9,7 @@ public class AddEmployeeTable : Migration
     {
         Create.Table("employees")
             .InSchema("business_management")
-            .WithColumn("id").AsInt64().PrimaryKey()
+            .WithColumn("id").AsInt64().PrimaryKey().Identity()
             .WithColumn("guid").AsGuid().NotNullable()
             .WithColumn("user_id").AsGuid().Nullable()
             .WithColumn("business_id").AsGuid().NotNullable()
@@ -21,13 +21,13 @@ public class AddEmployeeTable : Migration
             .WithColumn("last_name").AsString(255).NotNullable()
             .WithColumn("email").AsString(1000).NotNullable()
             .WithColumn("phone_number").AsString(255).Nullable();
-        
+
         Create.Table("employees_invitation")
             .InSchema("business_management")
-            .WithColumn("id").AsInt64().PrimaryKey()
+            .WithColumn("id").AsInt64().PrimaryKey().Identity()
             .WithColumn("guid").AsGuid().NotNullable()
             .WithColumn("business_id").AsGuid().NotNullable()
-            .WithColumn("employee_id").AsDateTime().NotNullable()
+            .WithColumn("employee_id").AsGuid().NotNullable()
             .WithColumn("email").AsString(1000).NotNullable()
             .WithColumn("created_at").AsDateTime().NotNullable()
             .WithColumn("valid_to").AsDateTime().NotNullable()
@@ -39,6 +39,5 @@ public class AddEmployeeTable : Migration
     {
         Delete.Table("employees").InSchema("business_management");
         Delete.Table("employees_invitation").InSchema("business_management");
-        
     }
 }
