@@ -3,6 +3,7 @@ using BooksyClone.Domain.Availability.Storage;
 using BooksyClone.Domain.BusinessManagement.ConfiguringServiceVariantsOfferedByBusiness;
 using BooksyClone.Domain.BusinessManagement.EmployeesManagement;
 using BooksyClone.Domain.BusinessManagement.FetchingBusinessConfiguration;
+using BooksyClone.Domain.BusinessManagement.FetchingEmployeeBusinesses;
 using BooksyClone.Domain.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,11 +17,14 @@ public class BusinessManagementBuilder(IConfiguration configuration)
 		var serviceProvider = services.BuildServiceProvider();
 
 		var connectionString = configuration.GetPostgresDatabaseConnectionString();
+		var dbConnectionFactory = new DbConnectionFactory(connectionString);
 		return new BusinessManagementFacade(
-			new ConfigureServiceVariantsOfferedByBusiness(new DbConnectionFactory(connectionString)),
-			new GetBusinessConfiguration(new DbConnectionFactory(connectionString)),
-			new RegisterNewEmployee(new DbConnectionFactory(connectionString))
-		//serviceProvider.GetRequiredService<AuthFacade>()
+			new ConfigureServiceVariantsOfferedByBusiness(dbConnectionFactory),
+			new GetBusinessConfiguration(dbConnectionFactory),
+			new RegisterNewEmployee(dbConnectionFactory),
+			serviceProvider.GetRequiredService<AuthFacade>(),
+			new AcceptEmployeeInvitationToJoiningBusiness(dbConnectionFactory),
+			new FetchEmployeeBusinesses(dbConnectionFactory)
 
 		);
 	}

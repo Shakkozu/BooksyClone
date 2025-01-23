@@ -40,11 +40,12 @@ public class InvitingEmployeeToBusinessTests
     {
         var registeredUserId = Guid.NewGuid();
         var businessUnitId = await _app.OnboardingFixture.ABusinessExists(registeredUserId);
+		var password = "Password123!";
         var registerNewEmployeeRequest = new RegisterNewEmployeeRequest
         {
             EmployeeId = Guid.NewGuid(),
             BusinessUnitId = businessUnitId,
-            Email = "newEmployee@example.com",
+            Email = $"{Guid.NewGuid()}-employee@example.com",
             FirstName = "John",
             LastName = "Doe",
             PhoneNumber = "123456789",
@@ -57,8 +58,8 @@ public class InvitingEmployeeToBusinessTests
         var registerEmployeeAccountUsingTokenRequest = new RegisterEmployeeAccountUsingNewEmployeeTokenRequest
         {
             Email = registerNewEmployeeRequest.Email,
-            Password = "Password123",
-            ConfirmPassowrd = "Password123",
+            Password = password,
+            ConfirmPassowrd = password,
             PhoneNumber = registerNewEmployeeRequest.PhoneNumber,
             Token = registeringNewEmployeeResult.Token
         };
@@ -66,7 +67,7 @@ public class InvitingEmployeeToBusinessTests
         var registrationResult = await facade.RegisterEmployeeAccountUsingNewEmployeeTokenAsync(registerEmployeeAccountUsingTokenRequest);
         Assert.That(registrationResult.Succeeded, Is.True);
 
-        var loginDto = new LoginUserDto { Email = registerNewEmployeeRequest.Email, Password = "Password123" };
+        var loginDto = new LoginUserDto { Email = registerNewEmployeeRequest.Email, Password = password };
         var loginResponse = await _app.CreateHttpClient().PostAsync("/api/accounts/login", new StringContent(JsonConvert.SerializeObject(loginDto), Encoding.UTF8, "application/json"));
         var responseContent = await loginResponse.Content.ReadAsStringAsync();
         var sessionToken = JsonConvert.DeserializeObject<LoginResponseDto>(responseContent)!.Token;
