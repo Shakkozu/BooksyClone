@@ -12,6 +12,7 @@ using BooksyClone.Domain.Auth.FetchingUserFromHttpContext;
 using Microsoft.AspNetCore.Routing;
 using BooksyClone.Domain.Auth.LoggingOut;
 using BooksyClone.Domain.Auth.RestrictedResource;
+using BooksyClone.Domain.Auth.FetchingMailById;
 
 namespace BooksyClone.Domain.Auth;
 
@@ -72,7 +73,8 @@ public static class AuthInstaller
 				new RegisterUserCommandHandler(userManager),
 				new LoginUserCommandHandler(userManager, signInManager, roleManager, configuration),
 				new HttpContextUserIdProvider(provider.GetRequiredService<IHttpContextAccessor>()),
-				new GetUserIdByEmailHandlerQueryHandler(userManager)
+				new GetUserIdByEmailHandlerQueryHandler(userManager),
+				new GetUserEmailByUserIdQueryHandler(userManager)
 				);
 		});
 

@@ -1,4 +1,5 @@
-﻿using BooksyClone.Domain.Availability;
+﻿using BooksyClone.Domain.Auth;
+using BooksyClone.Domain.Availability;
 using BooksyClone.Domain.BusinessManagement;
 using BooksyClone.Domain.BusinessOnboarding;
 using BooksyClone.Domain.Dictionaries;
@@ -88,6 +89,9 @@ public class BooksyCloneApp : WebApplicationFactory<Program>
 
     public BusinessManagementFacade BusinessManagementFacade =>
         RequestScope().ServiceProvider.GetRequiredService<BusinessManagementFacade>();
+
+    public AuthFacade AuthFacade =>
+        RequestScope().ServiceProvider.GetRequiredService<AuthFacade>();
 
     public OnboardingFacade OnboardingFacade => RequestScope().ServiceProvider.GetRequiredService<OnboardingFacade>();
 

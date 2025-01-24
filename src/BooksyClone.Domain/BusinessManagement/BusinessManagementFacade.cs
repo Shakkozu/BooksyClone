@@ -3,6 +3,7 @@ using BooksyClone.Contract.Shared;
 using BooksyClone.Domain.Auth;
 using BooksyClone.Domain.Auth.GettingUserIdByEmail;
 using BooksyClone.Domain.Auth.RegisterUser;
+using BooksyClone.Domain.BusinessManagement.AcceptingInvitationToJoinBusiness;
 using BooksyClone.Domain.BusinessManagement.ConfiguringServiceVariantsOfferedByBusiness;
 using BooksyClone.Domain.BusinessManagement.EmployeesManagement;
 using BooksyClone.Domain.BusinessManagement.FetchingBusinessConfiguration;
@@ -67,6 +68,16 @@ public class BusinessManagementFacade
 	public async Task<RegistrationToken> RegisterNewEmployeeToBusinessAsync(RegisterNewEmployeeRequest registerNewEmployeeRequest, CancellationToken ct)
 	{
 		return await _registerNewEmployee.HandleAsync(registerNewEmployeeRequest, ct);
+	}
+
+	internal async Task AcceptInvitation(Guid userId, string token)
+	{
+		var email = await _authFacade.GetEmailByUserId(userId);
+		var result = _acceptEmployeeInvitationToJoiningBusiness.AcceptInvitation(userId, email, token);
+		if (!result.Succeeded)
+		{
+			throw new InvalidOperationException("Failed to accept invitation.");
+		}
 	}
 
 	internal async Task<IEnumerable<Guid>> FetchEmployeeBusinesses(Guid userId)

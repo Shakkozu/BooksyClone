@@ -1,4 +1,5 @@
-﻿using BooksyClone.Domain.BusinessManagement.ConfiguringServiceVariantsOfferedByBusiness;
+﻿using BooksyClone.Domain.BusinessManagement.AcceptingInvitationToJoinBusiness;
+using BooksyClone.Domain.BusinessManagement.ConfiguringServiceVariantsOfferedByBusiness;
 using BooksyClone.Domain.BusinessManagement.FetchingBusinessConfiguration;
 using BooksyClone.Domain.BusinessManagement.FetchingEmployeeBusinesses;
 using BooksyClone.Infrastructure.EmailSending;
@@ -26,5 +27,6 @@ public static class BusinessManagementModule
 		endpoints.MapConfigureServiceVariantsOfferedByBusinessEndpoint();
 		endpoints.MapGetBusinessConfigurationEndpoint();
 		endpoints.MapGetEmployeeBusinessesEndpoint();
+		endpoints.MapAcceptInvitationEndpoint();
 	}
 }
