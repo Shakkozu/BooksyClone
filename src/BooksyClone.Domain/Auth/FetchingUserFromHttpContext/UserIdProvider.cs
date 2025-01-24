@@ -2,12 +2,7 @@
 
 namespace BooksyClone.Domain.Auth.FetchingUserFromHttpContext;
 
-public interface IFetchUserIdentifierFromContext
-{
-	Guid GetUserId();
-}
-
-public class HttpContextUserIdProvider : IFetchUserIdentifierFromContext
+internal class HttpContextUserIdProvider
 {
 	private readonly IHttpContextAccessor _httpContextAccessor;
 

@@ -1,4 +1,5 @@
-﻿using BooksyClone.Domain.Availability;
+﻿using BooksyClone.Domain.Auth;
+using BooksyClone.Domain.Availability;
 using BooksyClone.Domain.BusinessManagement;
 using BooksyClone.Domain.BusinessOnboarding;
 using BooksyClone.Domain.Dictionaries;
@@ -10,6 +11,7 @@ using BooksyClone.Tests.BusinessOnboarding;
 using FakeItEasy;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
@@ -88,11 +90,15 @@ public class BooksyCloneApp : WebApplicationFactory<Program>
     public BusinessManagementFacade BusinessManagementFacade =>
         RequestScope().ServiceProvider.GetRequiredService<BusinessManagementFacade>();
 
+    public AuthFacade AuthFacade =>
+        RequestScope().ServiceProvider.GetRequiredService<AuthFacade>();
+
     public OnboardingFacade OnboardingFacade => RequestScope().ServiceProvider.GetRequiredService<OnboardingFacade>();
 
     internal OnboardingFixture OnboardingFixture =>
         RequestScope().ServiceProvider.GetRequiredService<OnboardingFixture>();
-
+    
+    internal IConfiguration Configuration => RequestScope().ServiceProvider.GetRequiredService<IConfiguration>();
 
     public HttpClient CreateHttpClient()
     {

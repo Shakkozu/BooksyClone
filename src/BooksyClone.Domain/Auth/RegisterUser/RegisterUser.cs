@@ -17,15 +17,8 @@ public record UserForRegistrationDto
 
 public record RegistrationResponseDto(bool Success, IEnumerable<string>? Errors);
 
-public class RegisterUserCommandHandler
+internal class RegisterUserCommandHandler(UserManager<IdentityUser> _userManager)
 {
-	private readonly UserManager<IdentityUser> _userManager;
-
-	public RegisterUserCommandHandler(UserManager<IdentityUser> userManager)
-	{
-		_userManager = userManager;
-	}
-
 	public async Task<RegistrationResponseDto> HandleAsync(UserForRegistrationDto userForRegistrationDto, CancellationToken ct)
 	{
 		var user = new IdentityUser

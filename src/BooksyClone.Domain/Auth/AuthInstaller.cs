@@ -12,6 +12,7 @@ using BooksyClone.Domain.Auth.FetchingUserFromHttpContext;
 using Microsoft.AspNetCore.Routing;
 using BooksyClone.Domain.Auth.LoggingOut;
 using BooksyClone.Domain.Auth.RestrictedResource;
+using BooksyClone.Domain.Auth.FetchingMailById;
 
 namespace BooksyClone.Domain.Auth;
 
@@ -22,6 +23,7 @@ internal record JwtSettings
 	public string Audience { get; init; }
 	public int TokenExpirationInMinutes { get; init; }
 }
+
 public static class AuthInstaller
 {
 	public static IServiceCollection InstallAuthModule(this IServiceCollection services, IConfiguration configuration)
@@ -56,10 +58,24 @@ public static class AuthInstaller
 			};
 		});
 		services.AddScoped<HttpContextAccessor>();
-		services.AddScoped<IFetchUserIdentifierFromContext>(provider =>
+		services.AddScoped(provider =>
 		{
 			var httpContextAccessor = provider.GetRequiredService<IHttpContextAccessor>();
 			return new HttpContextUserIdProvider(httpContextAccessor);
+		});
+
+		services.AddScoped(provider =>
+		{
+			var userManager = provider.GetRequiredService<UserManager<IdentityUser>>();
+			var signInManager = provider.GetRequiredService<SignInManager<IdentityUser>>();
+			var roleManager = provider.GetRequiredService<RoleManager<IdentityRole>>();
+			return new AuthFacade(
+				new RegisterUserCommandHandler(userManager),
+				new LoginUserCommandHandler(userManager, signInManager, roleManager, configuration),
+				new HttpContextUserIdProvider(provider.GetRequiredService<IHttpContextAccessor>()),
+				new GetUserIdByEmailHandlerQueryHandler(userManager),
+				new GetUserEmailByUserIdQueryHandler(userManager)
+				);
 		});
 
 		return services;

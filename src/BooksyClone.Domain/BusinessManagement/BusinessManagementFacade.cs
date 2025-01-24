@@ -1,73 +1,87 @@
 using BooksyClone.Contract.BusinessManagement;
 using BooksyClone.Contract.Shared;
-using BooksyClone.Domain.Availability.Storage;
+using BooksyClone.Domain.Auth;
+using BooksyClone.Domain.Auth.GettingUserIdByEmail;
+using BooksyClone.Domain.Auth.RegisterUser;
+using BooksyClone.Domain.BusinessManagement.AcceptingInvitationToJoinBusiness;
 using BooksyClone.Domain.BusinessManagement.ConfiguringServiceVariantsOfferedByBusiness;
+using BooksyClone.Domain.BusinessManagement.EmployeesManagement;
 using BooksyClone.Domain.BusinessManagement.FetchingBusinessConfiguration;
-using BooksyClone.Domain.Storage;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using BooksyClone.Domain.BusinessManagement.FetchingEmployeeBusinesses;
 
 namespace BooksyClone.Domain.BusinessManagement;
 
 public class BusinessManagementFacade
 {
-    private readonly ConfigureServiceVariantsOfferedByBusiness _configureServiceVariantsOfferedByBusiness;
-    private readonly GetBusinessConfiguration _getBusinessConfiguration;
+	private readonly ConfigureServiceVariantsOfferedByBusiness _configureServiceVariantsOfferedByBusiness;
+	private readonly GetBusinessConfiguration _getBusinessConfiguration;
+	private readonly RegisterNewEmployee _registerNewEmployee;
+	private readonly AuthFacade _authFacade;
+	private readonly AcceptEmployeeInvitationToJoiningBusiness _acceptEmployeeInvitationToJoiningBusiness;
+	private readonly FetchEmployeeBusinesses _fetchEmployeeBusinesses;
 
-    internal BusinessManagementFacade(
-        ConfigureServiceVariantsOfferedByBusiness configureServiceVariantsOfferedByBusiness,
-        GetBusinessConfiguration getBusinessConfiguration)
-    {
-        _configureServiceVariantsOfferedByBusiness = configureServiceVariantsOfferedByBusiness;
-        _getBusinessConfiguration = getBusinessConfiguration;
-    }
+	internal BusinessManagementFacade(
+		ConfigureServiceVariantsOfferedByBusiness configureServiceVariantsOfferedByBusiness,
+		GetBusinessConfiguration getBusinessConfiguration,
+		RegisterNewEmployee registerNewEmployee,
+		AuthFacade authFacade,
+		AcceptEmployeeInvitationToJoiningBusiness acceptEmployeeInvitationToJoiningBusiness,
+		FetchEmployeeBusinesses fetchEmployeeBusinesses
+		)
+	{
+		_configureServiceVariantsOfferedByBusiness = configureServiceVariantsOfferedByBusiness;
+		_getBusinessConfiguration = getBusinessConfiguration;
+		_registerNewEmployee = registerNewEmployee;
+		_authFacade = authFacade;
+		_acceptEmployeeInvitationToJoiningBusiness = acceptEmployeeInvitationToJoiningBusiness;
+		_fetchEmployeeBusinesses = fetchEmployeeBusinesses;
+	}
 
-    public async Task<Result> ConfigureServicesOfferedByBusiness(
-        BusinessServiceConfigurationDto businessServiceConfigurationDto,
-        CancellationToken ct)
-    {
-        return await _configureServiceVariantsOfferedByBusiness.HandleAsync(businessServiceConfigurationDto, ct);
-    }
+	public async Task<Result> ConfigureServicesOfferedByBusiness(
+		BusinessServiceConfigurationDto businessServiceConfigurationDto,
+		CancellationToken ct)
+	{
+		return await _configureServiceVariantsOfferedByBusiness.HandleAsync(businessServiceConfigurationDto, ct);
+	}
 
-    public async Task<BusinessServiceConfigurationDto?> GetBusinessConfigurationAsync(Guid businessUnitId, CancellationToken ct)
-    {
-        return await _getBusinessConfiguration.HandleAsync(businessUnitId, ct);
-    }
-}
+	public async Task<BusinessServiceConfigurationDto?> GetBusinessConfigurationAsync(Guid businessUnitId, CancellationToken ct)
+	{
+		return await _getBusinessConfiguration.HandleAsync(businessUnitId, ct);
+	}
 
-internal class BusinessManagementBuilder
-{
-    private readonly IConfiguration _configuration;
+	public async Task<Result> RegisterEmployeeAccountUsingNewEmployeeTokenAsync(RegisterEmployeeAccountUsingNewEmployeeTokenRequest registerEmployeeAccountUsingTokenRequest)
+	{
+		var registerDto = new UserForRegistrationDto
+		{
+			ConfirmPassword = registerEmployeeAccountUsingTokenRequest.Password,
+			Email = registerEmployeeAccountUsingTokenRequest.Email,
+			Password = registerEmployeeAccountUsingTokenRequest.Password
+		};
+		var registration = await _authFacade.RegisterUserAsync(registerDto, CancellationToken.None);
+		if (!registration.Success)
+			return Result.ErrorResult(registration.Errors?.ToList() ?? []);
 
-    public BusinessManagementBuilder(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
+		var userId = await _authFacade.GetUserIdByEmail(new GetUserIdByEmailQuery(registerEmployeeAccountUsingTokenRequest.Email));
+		return _acceptEmployeeInvitationToJoiningBusiness.AcceptInvitation(Guid.Parse(userId), registerEmployeeAccountUsingTokenRequest.Email, registerEmployeeAccountUsingTokenRequest.Token);
+	}
 
-    public BusinessManagementFacade Build()
-    {
-        return new BusinessManagementFacade(
-            new ConfigureServiceVariantsOfferedByBusiness(new DbConnectionFactory(_configuration.GetPostgresDatabaseConnectionString())),
-            new GetBusinessConfiguration(new DbConnectionFactory(_configuration.GetPostgresDatabaseConnectionString()))
-        );
-    }
-}
+	public async Task<RegistrationToken> RegisterNewEmployeeToBusinessAsync(RegisterNewEmployeeRequest registerNewEmployeeRequest, CancellationToken ct)
+	{
+		return await _registerNewEmployee.HandleAsync(registerNewEmployeeRequest, ct);
+	}
 
-public static class BusinessManagementModule
-{
-    public static void InstallBusinessManagementModule(this IServiceCollection services, IConfiguration config)
-    {
-        services.AddTransient<BusinessManagementFacade>(sp =>
-        {
-            var builder = new BusinessManagementBuilder(config);
-            return builder.Build();
-        });
-    }
+	internal async Task AcceptInvitation(Guid userId, string token)
+	{
+		var email = await _authFacade.GetEmailByUserId(userId);
+		var result = _acceptEmployeeInvitationToJoiningBusiness.AcceptInvitation(userId, email, token);
+		if (!result.Succeeded)
+		{
+			throw new InvalidOperationException("Failed to accept invitation.");
+		}
+	}
 
-    public static void MapBusinessManagementEndpoints(this IEndpointRouteBuilder endpoints)
-    {
-        endpoints.MapConfigureServiceVariantsOfferedByBusinessEndpoint();
-        endpoints.MapGetBusinessConfigurationEndpoint();
-    }
+	internal async Task<IEnumerable<Guid>> FetchEmployeeBusinesses(Guid userId)
+	{
+		return await _fetchEmployeeBusinesses.HandleAsync(userId, CancellationToken.None);
+	}
 }

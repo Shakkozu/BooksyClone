@@ -3,15 +3,8 @@
 namespace BooksyClone.Domain.Auth.GettingUserIdByEmail;
 public record GetUserIdByEmailQuery(string Email);
 
-public class GetUserIdByEmailHandlerQueryHandler
+internal class GetUserIdByEmailHandlerQueryHandler(UserManager<IdentityUser> _userManager)
 {
-	private readonly UserManager<IdentityUser> _userManager;
-
-	public GetUserIdByEmailHandlerQueryHandler(UserManager<IdentityUser> userManager)
-	{
-		_userManager = userManager;
-	}
-
 	public async Task<string> HandleAsync(GetUserIdByEmailQuery query)
 	{
 		var user = await _userManager.FindByEmailAsync(query.Email);

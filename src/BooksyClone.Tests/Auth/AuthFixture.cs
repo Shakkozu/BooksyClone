@@ -1,35 +1,20 @@
-﻿using BooksyClone.Domain.Auth.GettingUserIdByEmail;
+﻿using BooksyClone.Domain.Auth;
+using BooksyClone.Domain.Auth.GettingUserIdByEmail;
 using BooksyClone.Domain.Auth.Login;
 using BooksyClone.Domain.Auth.RegisterUser;
 using Microsoft.Extensions.Configuration;
 
 namespace BooksyClone.Tests.Auth;
 
-public class AuthFixture
+public class AuthFixture(AuthFacade _authFacade,
+	IConfiguration _configuration)
 {
-	private readonly LoginUserCommandHandler _loginUserCommandHandler;
-	private readonly RegisterUserCommandHandler _registerUserCommandHandler;
-	private readonly GetUserIdByEmailHandlerQueryHandler _getUserIdByEmailQueryHandler;
-	private readonly IConfiguration _configuration;
-
-	public AuthFixture(LoginUserCommandHandler loginUserCommandHandler,
-		RegisterUserCommandHandler registerUserCommandHandler,
-		GetUserIdByEmailHandlerQueryHandler getUserIdByEmailQueryHandler,
-
-		IConfiguration configuration)
-	{
-		_loginUserCommandHandler = loginUserCommandHandler;
-		_registerUserCommandHandler = registerUserCommandHandler;
-		_getUserIdByEmailQueryHandler = getUserIdByEmailQueryHandler;
-		_configuration = configuration;
-	}
-
 	internal async Task<string> GetAuthenticationTokenForSuperUserAsync()
 	{
 		var email = TestUserCredentials.Administrator(_configuration).Email;
 		var password = TestUserCredentials.Administrator(_configuration).Password;
 
-		var authenticationResult = await _loginUserCommandHandler.HandleAsync(new LoginUserDto
+		var authenticationResult = await _authFacade.LoginUserAsync(new LoginUserDto
 		{
 			Email = email,
 			Password = password
@@ -39,7 +24,7 @@ public class AuthFixture
 			throw new Exception("Failed to authenticate user");
 		}
 
-		return authenticationResult.Token;
+		return authenticationResult.Token!;
 	}
 
 	internal async Task<string> GetAuthenticationTokenForUserAsync()
@@ -48,7 +33,7 @@ public class AuthFixture
 		var password = TestUserCredentials.User.Password;
 		await AssertThatUserIsRegistred(email, password);
 
-		var authenticationResult = await _loginUserCommandHandler.HandleAsync(new LoginUserDto
+		var authenticationResult = await _authFacade.LoginUserAsync(new LoginUserDto
 		{
 			Email = email,
 			Password = password
@@ -58,7 +43,7 @@ public class AuthFixture
 			throw new Exception("Failed to authenticate user");
 		}
 
-		return authenticationResult.Token;
+		return authenticationResult.Token!;
 	}
 
 	private async Task AssertThatUserIsRegistred(string email, string password)
@@ -66,14 +51,14 @@ public class AuthFixture
 		var userAlreadyExists = false;
 		try
 		{
-			userAlreadyExists = !string.IsNullOrEmpty(await _getUserIdByEmailQueryHandler.HandleAsync(new GetUserIdByEmailQuery(email)));
+			userAlreadyExists = !string.IsNullOrEmpty(await _authFacade.GetUserIdByEmail(new GetUserIdByEmailQuery(email)));
 		}
 		catch { }
 
 		if (!userAlreadyExists)
 		{
 			var dto = new UserForRegistrationDto { Email = email, Password = password, ConfirmPassword = password };
-			await _registerUserCommandHandler.HandleAsync(dto, CancellationToken.None);
+			await _authFacade.RegisterUserAsync(dto, CancellationToken.None);
 		}
 	}
 
@@ -82,14 +67,14 @@ public class AuthFixture
 		var email = TestUserCredentials.Administrator(_configuration).Email;
 		var password = TestUserCredentials.Administrator(_configuration).Password;
 		await AssertThatUserIsRegistred(email, password);
-		var result = await _getUserIdByEmailQueryHandler.HandleAsync(new GetUserIdByEmailQuery(TestUserCredentials.Administrator(_configuration).Email));
+		var result = await _authFacade.GetUserIdByEmail(new GetUserIdByEmailQuery(TestUserCredentials.Administrator(_configuration).Email));
 		return Guid.Parse(result);
 	}
 
 	internal async Task<Guid> GetUserIdAsync()
 	{
 		await AssertThatUserIsRegistred(TestUserCredentials.User.Email, TestUserCredentials.User.Password);
-		var result = await _getUserIdByEmailQueryHandler.HandleAsync(new GetUserIdByEmailQuery(TestUserCredentials.User.Email));
+		var result = await _authFacade.GetUserIdByEmail(new GetUserIdByEmailQuery(TestUserCredentials.User.Email));
 		return Guid.Parse(result);
 	}
 }

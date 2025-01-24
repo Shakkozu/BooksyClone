@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,14 +15,14 @@ public record LoginUserDto
 
 public record LoginResponseDto(bool Success, string? Token, string UserId, IEnumerable<string>? Errors);
 
-public class LoginUserCommandHandler
+internal class LoginUserCommandHandler
 {
 	private readonly UserManager<IdentityUser> _userManager;
 	private readonly SignInManager<IdentityUser> _signInManager;
 	private readonly RoleManager<IdentityRole> _roleManager;
 	private readonly IConfiguration _configuration;
 
-	public LoginUserCommandHandler(UserManager<IdentityUser> userManager,
+	internal LoginUserCommandHandler(UserManager<IdentityUser> userManager,
 		SignInManager<IdentityUser> signInManager,
 		RoleManager<IdentityRole> roleManager,
 		IConfiguration configuration)

@@ -1,9 +1,10 @@
-﻿using BooksyClone.Domain.Auth.FetchingUserFromHttpContext;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
 namespace BooksyClone.Domain.Auth.RestrictedResource;
+
 internal static class Route
 {
 	internal static IEndpointRouteBuilder MapGetRestrictedResourceEndpoint(this IEndpointRouteBuilder endpoints)
@@ -11,9 +12,9 @@ internal static class Route
 		endpoints.MapGet("/api/accounts/restricted-resource",
 			(HttpContext context,
 			CancellationToken ct,
-			IFetchUserIdentifierFromContext userIdProvider) =>
+			[FromServices] AuthFacade authFacade) =>
 			{
-				var userId = userIdProvider.GetUserId();
+				var userId = authFacade.GetLoggedUserId();
 				return Results.Ok(new { userId });
 			}).RequireAuthorization();
 
